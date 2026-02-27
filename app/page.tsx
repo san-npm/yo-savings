@@ -142,7 +142,7 @@ export default function HomePage() {
             </ConnectButton.Custom>
             
             <p className="text-xs text-zinc-500">
-              No crypto knowledge required • Secured by blockchain
+              Simple and secure • Protected by institutional-grade security
             </p>
           </div>
         </motion.div>

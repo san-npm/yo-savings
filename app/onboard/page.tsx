@@ -67,7 +67,7 @@ export default function OnboardPage() {
             <div className="w-8 h-8 bg-emerald-500/20 rounded-full flex items-center justify-center">
               <span className="text-emerald-500 text-sm">✓</span>
             </div>
-            <span className="text-zinc-300">No crypto knowledge required</span>
+            <span className="text-zinc-300">Simple and secure</span>
           </motion.div>
           
           <motion.div
@@ -91,7 +91,7 @@ export default function OnboardPage() {
             <div className="w-8 h-8 bg-emerald-500/20 rounded-full flex items-center justify-center">
               <span className="text-emerald-500 text-sm">✓</span>
             </div>
-            <span className="text-zinc-300">Secured by blockchain technology</span>
+            <span className="text-zinc-300">Protected by institutional-grade security</span>
           </motion.div>
         </div>
 

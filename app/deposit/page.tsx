@@ -183,7 +183,7 @@ export default function DepositPage() {
             <span className="text-sm font-medium text-emerald-500">Secure & Insured</span>
           </div>
           <p className="text-xs text-zinc-400">
-            Your deposits are secured by blockchain technology and backed by audited smart contracts.
+            Your deposits are secured by bank-grade encryption and backed by independently audited protocols.
           </p>
         </div>
       </motion.div>
