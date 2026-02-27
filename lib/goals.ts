@@ -36,12 +36,27 @@ const mockGoals: SavingsGoal[] = [
 ];
 
 export const saveGoals = (goals: SavingsGoal[]): void => {
-  // Mock implementation - in real app would save to localStorage
-  console.log('Saving goals:', goals);
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.setItem('savingsGoals', JSON.stringify(goals));
+    } catch (error) {
+      console.error('Failed to save goals to localStorage:', error);
+    }
+  }
 };
 
 export const loadGoals = (): SavingsGoal[] => {
-  // Mock implementation - return demo goals
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = localStorage.getItem('savingsGoals');
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (error) {
+      console.error('Failed to load goals from localStorage:', error);
+    }
+  }
+  // Return demo goals as fallback
   return mockGoals;
 };
 
