@@ -15,6 +15,20 @@ interface AccountRowProps {
   index?: number;
 }
 
+// Currency icon components
+const getCurrencyIcon = (accountId: string) => {
+  const iconClass = "w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold text-sm";
+  
+  switch (accountId) {
+    case 'dollar':
+      return <div className={`${iconClass} bg-green-500`}>$</div>;
+    case 'euro':
+      return <div className={`${iconClass} bg-blue-500`}>€</div>;
+    default:
+      return <div className={`${iconClass} bg-slate-500`}>{accountId[0].toUpperCase()}</div>;
+  }
+};
+
 export function AccountRow({
   account,
   balance,
@@ -31,66 +45,41 @@ export function AccountRow({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
+      className="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow"
     >
       <Link
         href={`/accounts/${account.id}`}
-        className="block p-4 bg-zinc-900/30 rounded-2xl border border-zinc-800/50 hover:border-zinc-700/50 transition-colors"
+        className="flex items-center justify-between p-4"
       >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <motion.div
-              className="w-10 h-10 flex items-center justify-center bg-zinc-800/50 rounded-full text-lg"
-              whileHover={{ rotate: 10 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-            >
-              {account.icon}
-            </motion.div>
-            
-            <div>
-              <h3 className="font-medium text-zinc-200">
-                {account.displayName}
-              </h3>
-              <p className="text-sm text-zinc-500">
-                {formatPercentage(annualRate)} annual rate
+        <div className="flex items-center space-x-4">
+          {getCurrencyIcon(account.id)}
+          
+          <div>
+            <h3 className="font-medium text-slate-800 text-base">
+              {account.displayName}
+            </h3>
+            <div className="flex items-center space-x-2">
+              <p className="text-sm text-green-500 font-medium">
+                {formatPercentage(annualRate)} APY
               </p>
+              {balance > 0 && (
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                  Earning
+                </span>
+              )}
             </div>
           </div>
-          
-          <div className="text-right">
-            <div className="font-semibold text-zinc-200 tabular-nums">
-              <CountUp
-                end={balance}
-                duration={1000}
-                decimals={account.id === 'bitcoin' ? 8 : account.id === 'ethereum' ? 6 : 2}
-              >
-                {(value) => {
-                  if (account.id === 'bitcoin') {
-                    return `${account.currencySymbol}${value.toFixed(8)}`;
-                  }
-                  if (account.id === 'ethereum') {
-                    return `${account.currencySymbol}${value.toFixed(6)}`;
-                  }
-                  if (account.id === 'gold') {
-                    return `${value.toFixed(4)} ${account.currencySymbol}`;
-                  }
-                  return `${account.currencySymbol}${value.toFixed(2)}`;
-                }}
-              </CountUp>
-            </div>
-            
-            {balance > 0 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 + index * 0.1 }}
-                className="text-xs text-emerald-500 flex items-center justify-end space-x-1"
-              >
-                <div className="w-1 h-1 bg-emerald-500 rounded-full" />
-                <span>Earning</span>
-              </motion.div>
-            )}
+        </div>
+        
+        <div className="text-right">
+          <div className="font-semibold text-slate-800 tabular-nums text-lg">
+            <CountUp
+              end={balance}
+              duration={1000}
+              decimals={2}
+            >
+              {(value) => `${account.currencySymbol}${value.toFixed(2)}`}
+            </CountUp>
           </div>
         </div>
       </Link>

@@ -4,16 +4,17 @@ import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useAccount } from 'wagmi';
-import { useDeposit, useApprove } from '@yo-protocol/react';
+import { parseTokenAmount, YO_GATEWAY_ADDRESS } from '@yo-protocol/core';
+import { useYoClient } from '@/lib/useYoClient';
 
 import { getAccountById, getAllAccounts, type AccountId } from '@/lib/accounts';
 import { DepositForm } from '@/components/DepositForm';
+import { CurrencyIcon } from '@/components/CurrencyIcon';
 
 export default function DepositPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { address } = useAccount();
+  const { getClient, address } = useYoClient();
   
   const preselectedAccountId = searchParams.get('account') as AccountId | null;
   const [selectedAccountId, setSelectedAccountId] = useState<AccountId>(
@@ -22,20 +23,45 @@ export default function DepositPage() {
 
   const selectedAccount = getAccountById(selectedAccountId);
   const allAccounts = getAllAccounts();
-  
-  const { deposit, isLoading: depositLoading } = useDeposit({ vault: selectedAccount.vaultAddress as `0x${string}` });
-  const { approve, isLoading: approveLoading } = useApprove({ token: selectedAccount.tokenAddress as `0x${string}` });
 
-  const handleDeposit = async (amount: number) => {
+  const handleDeposit = async (amount: string) => {
     try {
-      // Real YO SDK flow:
-      // 1. Approve tokens for the vault if needed
-      await approve(BigInt(amount));
+      if (!address) throw new Error('No wallet connected');
       
-      // 2. Execute deposit - deposits the underlying token amount
-      await deposit(BigInt(amount));
+      const client = await getClient();
       
-      // Success is handled by the DepositForm component
+      // Parse amount with 6 decimals (USDC/EURC)
+      const parsedAmount = parseTokenAmount(amount, 6);
+      
+      // Check allowance first
+      const hasAllowance = await client.hasEnoughAllowance(
+        selectedAccount.tokenAddress as `0x${string}`,
+        address,
+        YO_GATEWAY_ADDRESS,
+        parsedAmount
+      );
+      
+      // Approve if needed
+      if (!hasAllowance) {
+        const approveResult = await client.approve(
+          selectedAccount.tokenAddress as `0x${string}`,
+          parsedAmount
+        );
+        // Extract hash from result - it might be an object with a hash property
+        const approveHash = typeof approveResult === 'string' ? approveResult : approveResult.hash;
+        await client.waitForTransaction(approveHash);
+      }
+      
+      // Execute deposit
+      const depositResult = await client.deposit({
+        vault: selectedAccount.vaultAddress as `0x${string}`,
+        amount: parsedAmount
+      });
+      
+      // Extract hash from result - it might be an object with a hash property
+      const depositHash = typeof depositResult === 'string' ? depositResult : depositResult.hash;
+      
+      return { hash: depositHash };
     } catch (error) {
       console.error('Deposit failed:', error);
       throw error;
@@ -45,7 +71,7 @@ export default function DepositPage() {
   if (!address) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-zinc-400">Please connect your wallet first</p>
+        <p className="text-slate-500">Please sign in first</p>
       </div>
     );
   }
@@ -60,11 +86,11 @@ export default function DepositPage() {
       <div className="flex items-center justify-between">
         <Link
           href="/"
-          className="p-2 hover:bg-zinc-800/50 rounded-xl transition-colors"
+          className="p-2 hover:bg-slate-100 rounded-xl transition-colors"
         >
           <span className="text-xl">←</span>
         </Link>
-        <h1 className="text-lg font-medium text-zinc-200">Add Money</h1>
+        <h1 className="text-lg font-medium text-slate-800">Add Money</h1>
         <div className="w-8" /> {/* Spacer */}
       </div>
 
@@ -76,7 +102,7 @@ export default function DepositPage() {
           transition={{ delay: 0.1 }}
           className="space-y-4"
         >
-          <h2 className="text-sm font-medium text-zinc-400">
+          <h2 className="text-sm font-medium text-slate-500">
             Choose Savings Account
           </h2>
           
@@ -88,12 +114,12 @@ export default function DepositPage() {
                 onClick={() => setSelectedAccountId(account.id)}
                 className={`w-full p-3 rounded-xl border transition-all ${
                   selectedAccountId === account.id
-                    ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-500'
-                    : 'bg-zinc-900/30 border-zinc-800/50 text-zinc-300 hover:border-zinc-700/50'
+                    ? 'bg-green-50 border-green-500 text-green-600'
+                    : 'bg-white border-slate-200 text-slate-700 shadow-sm hover:border-slate-300'
                 }`}
               >
                 <div className="flex items-center space-x-3">
-                  <span className="text-lg">{account.icon}</span>
+                  <CurrencyIcon accountId={account.id} size="sm" />
                   <span className="font-medium">{account.displayName}</span>
                 </div>
               </motion.button>
@@ -121,32 +147,31 @@ export default function DepositPage() {
         transition={{ delay: 0.3 }}
         className="space-y-4"
       >
-        <div className="p-4 bg-zinc-900/20 rounded-xl border border-zinc-800/30">
-          <h3 className="text-sm font-medium text-zinc-300 mb-2">
+        <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
+          <h3 className="text-sm font-medium text-slate-700 mb-2">
             How it works
           </h3>
-          <div className="space-y-2 text-xs text-zinc-500">
+          <div className="space-y-2 text-xs text-slate-500">
             <div className="flex items-start space-x-2">
-              <span className="text-emerald-500 mt-0.5">•</span>
+              <span className="text-green-500 mt-0.5">•</span>
               <span>Your money goes into a secure savings account</span>
             </div>
             <div className="flex items-start space-x-2">
-              <span className="text-emerald-500 mt-0.5">•</span>
+              <span className="text-green-500 mt-0.5">•</span>
               <span>Starts earning interest immediately</span>
             </div>
             <div className="flex items-start space-x-2">
-              <span className="text-emerald-500 mt-0.5">•</span>
+              <span className="text-green-500 mt-0.5">•</span>
               <span>Withdraw anytime with no penalties</span>
             </div>
           </div>
         </div>
 
-        <div className="p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl">
+        <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
           <div className="flex items-center space-x-2 mb-2">
-            <span className="text-emerald-500">🔒</span>
-            <span className="text-sm font-medium text-emerald-500">Secure & Insured</span>
+            <span className="text-sm font-medium text-green-500">Secure & Insured</span>
           </div>
-          <p className="text-xs text-zinc-400">
+          <p className="text-xs text-slate-500">
             Your deposits are secured by bank-grade encryption and backed by independently audited protocols.
           </p>
         </div>

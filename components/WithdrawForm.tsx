@@ -5,11 +5,12 @@ import { motion } from 'framer-motion';
 import type { SavingsAccount } from '@/lib/accounts';
 import { parseAmountInput, formatBalance } from '@/lib/format';
 import { Confetti } from './Confetti';
+import { CurrencyIcon } from './CurrencyIcon';
 
 interface WithdrawFormProps {
   account: SavingsAccount;
   availableBalance: number;
-  onWithdraw: (amount: number) => Promise<void>;
+  onWithdraw: (amount: string) => Promise<{ hash: string; instant: boolean }>;
   isLoading?: boolean;
 }
 
@@ -23,6 +24,9 @@ export function WithdrawForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [successAmount, setSuccessAmount] = useState(0);
+  const [txHash, setTxHash] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isQueued, setIsQueued] = useState(false);
 
   const handleAmountChange = (value: string) => {
     // Allow only numbers and decimal point
@@ -53,15 +57,18 @@ export function WithdrawForm({
     if (parsedAmount <= 0 || parsedAmount > availableBalance) return;
 
     setIsSubmitting(true);
+    setError(null);
     setSuccessAmount(parsedAmount);
     
     try {
-      await onWithdraw(parsedAmount);
+      const result = await onWithdraw(amount);
+      setTxHash(result.hash);
+      setIsQueued(!result.instant);
       setShowSuccess(true);
       setAmount('');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Withdrawal failed:', error);
-      // In real app, show error message
+      setError(error?.message || 'Withdrawal failed. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -87,24 +94,39 @@ export function WithdrawForm({
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-          className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center"
+          className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center"
         >
           <span className="text-2xl">✅</span>
         </motion.div>
         
-        <div className="text-center">
-          <h2 className="text-xl font-semibold text-zinc-200 mb-2">
-            Done!
+        <div className="text-center space-y-2">
+          <h2 className="text-xl font-semibold text-slate-800 mb-2">
+            {isQueued ? 'Queued for Processing' : 'Done!'}
           </h2>
-          <p className="text-zinc-400">
-            {account.currencySymbol}{successAmount} sent to your wallet
+          <p className="text-slate-600">
+            {account.currencySymbol}{successAmount} {isQueued ? 'queued for withdrawal' : 'withdrawn to your account'}
           </p>
+          {isQueued && (
+            <p className="text-sm text-orange-600">
+              Your withdrawal may take some time to process during high demand
+            </p>
+          )}
+          {txHash && (
+            <a
+              href={`https://basescan.org/tx/${txHash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-green-600 hover:text-green-700 underline"
+            >
+              View transaction
+            </a>
+          )}
         </div>
         
         <motion.button
           whileTap={{ scale: 0.95 }}
           onClick={() => setShowSuccess(false)}
-          className="px-6 py-3 bg-emerald-500 text-white font-medium rounded-xl hover:bg-emerald-600 transition-colors"
+          className="px-6 py-3 bg-green-500 text-white font-medium rounded-xl hover:bg-green-600 transition-colors"
         >
           Done
         </motion.button>
@@ -120,24 +142,22 @@ export function WithdrawForm({
       className="space-y-8"
     >
       {/* Account Header */}
-      <div className="flex items-center justify-between p-4 bg-zinc-900/30 rounded-2xl border border-zinc-800/50">
+      <div className="flex items-center justify-between p-4 bg-white rounded-2xl shadow-sm">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 flex items-center justify-center bg-zinc-800/50 rounded-full text-lg">
-            {account.icon}
-          </div>
+          <CurrencyIcon accountId={account.id} />
           <div>
-            <h2 className="font-medium text-zinc-200">{account.displayName}</h2>
-            <p className="text-sm text-zinc-500">Withdraw to your wallet</p>
+            <h2 className="font-medium text-slate-800">{account.displayName}</h2>
+            <p className="text-sm text-slate-400">Withdraw to your account</p>
           </div>
         </div>
       </div>
 
       {/* Available Balance */}
-      <div className="p-4 bg-zinc-900/20 rounded-xl border border-zinc-800/30">
+      <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-zinc-400">Available balance</span>
+          <span className="text-sm text-slate-500">Available balance</span>
           <div className="text-right">
-            <div className="font-semibold text-zinc-200 tabular-nums">
+            <div className="font-semibold text-slate-800 tabular-nums">
               {formatBalance(availableBalance, account.id)}
             </div>
           </div>
@@ -147,14 +167,14 @@ export function WithdrawForm({
       {/* Amount Input */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <label className="block text-sm font-medium text-zinc-400">
+          <label className="block text-sm font-medium text-slate-500">
             Amount to withdraw
           </label>
           <motion.button
             type="button"
             whileTap={{ scale: 0.95 }}
             onClick={handleMaxAmount}
-            className="text-sm text-emerald-500 hover:text-emerald-400 transition-colors"
+            className="text-sm text-green-500 hover:text-green-400 transition-colors"
           >
             Max
           </motion.button>
@@ -166,12 +186,12 @@ export function WithdrawForm({
             value={amount}
             onChange={(e) => handleAmountChange(e.target.value)}
             placeholder="0.00"
-            className={`w-full text-4xl font-semibold text-center bg-transparent placeholder-zinc-600 border-none outline-none tabular-nums ${
-              isOverLimit ? 'text-red-400' : 'text-zinc-200'
+            className={`w-full text-4xl font-semibold text-center bg-transparent placeholder-slate-400 border-none outline-none tabular-nums ${
+              isOverLimit ? 'text-red-400' : 'text-slate-800'
             }`}
             autoFocus
           />
-          <div className="absolute left-1/2 transform -translate-x-1/2 -top-8 text-2xl text-zinc-400">
+          <div className="absolute left-1/2 transform -translate-x-1/2 -top-8 text-2xl text-slate-500">
             {account.currencySymbol}
           </div>
           
@@ -194,13 +214,20 @@ export function WithdrawForm({
               type="button"
               whileTap={{ scale: 0.95 }}
               onClick={() => handleQuickPercentage(percentage)}
-              className="py-2 px-3 text-sm font-medium text-zinc-400 bg-zinc-800/50 rounded-xl hover:bg-zinc-700/50 hover:text-zinc-300 transition-colors"
+              className="py-2 px-3 text-sm font-medium text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 hover:text-slate-700 transition-colors"
             >
               {percentage}%
             </motion.button>
           ))}
         </div>
       </div>
+
+      {/* Error Display */}
+      {error && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded-xl">
+          <p className="text-sm text-red-600">{error}</p>
+        </div>
+      )}
 
       {/* Withdraw Button */}
       <motion.button
@@ -209,8 +236,8 @@ export function WithdrawForm({
         whileTap={{ scale: isValid ? 0.95 : 1 }}
         className={`w-full h-12 rounded-xl font-medium transition-all ${
           isValid
-            ? 'bg-emerald-500 text-white hover:bg-emerald-600'
-            : 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
+            ? 'bg-emerald-400 text-white hover:bg-emerald-500'
+            : 'bg-slate-200 text-slate-500 cursor-not-allowed'
         }`}
       >
         {isSubmitting ? (
@@ -228,8 +255,8 @@ export function WithdrawForm({
       </motion.button>
 
       {/* Info */}
-      <div className="text-center text-xs text-zinc-500 space-y-1">
-        <p>Funds will be sent to your connected wallet</p>
+      <div className="text-center text-xs text-slate-500 space-y-1">
+        <p>Funds will be available in your account</p>
         <p>No fees • Instant processing</p>
       </div>
     </motion.form>

@@ -12,19 +12,6 @@ export const formatCurrency = (
 ): string => {
   const { minimumFractionDigits = 2, maximumFractionDigits = 2, compact = false } = options;
   
-  // For crypto currencies, use different formatting
-  if (currency === 'BTC') {
-    return `${DISPLAY_CURRENCIES[currency]}${amount.toFixed(8)}`;
-  }
-  
-  if (currency === 'ETH') {
-    return `${DISPLAY_CURRENCIES[currency]}${amount.toFixed(6)}`;
-  }
-  
-  if (currency === 'GOLD') {
-    return `${amount.toFixed(4)} ${DISPLAY_CURRENCIES[currency]}`;
-  }
-  
   // For fiat currencies
   const formatter = new Intl.NumberFormat('en-US', {
     minimumFractionDigits,
@@ -41,9 +28,6 @@ export const formatBalance = (amount: number, accountId: AccountId): string => {
   const currencyMap: Record<AccountId, keyof typeof DISPLAY_CURRENCIES> = {
     dollar: 'USD',
     euro: 'EUR',
-    bitcoin: 'BTC',
-    ethereum: 'ETH',
-    gold: 'GOLD',
   };
   
   return formatCurrency(amount, currencyMap[accountId]);

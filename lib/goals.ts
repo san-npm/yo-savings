@@ -11,8 +11,8 @@ export interface SavingsGoal {
   updatedAt: string;
 }
 
-// Mock data for demo - in real app this would be localStorage or database
-const mockGoals: SavingsGoal[] = [
+// Default goals for initial seed
+const getDefaultGoals = (): SavingsGoal[] => [
   {
     id: 'goal_1',
     name: 'Vacation Fund',
@@ -35,7 +35,7 @@ const mockGoals: SavingsGoal[] = [
   },
 ];
 
-export const saveGoals = (goals: SavingsGoal[]): void => {
+const saveGoals = (goals: SavingsGoal[]): void => {
   if (typeof window !== 'undefined') {
     try {
       localStorage.setItem('savingsGoals', JSON.stringify(goals));
@@ -50,17 +50,19 @@ export const loadGoals = (): SavingsGoal[] => {
     try {
       const stored = localStorage.getItem('savingsGoals');
       if (stored) {
-        return JSON.parse(stored);
+        const parsed = JSON.parse(stored);
+        return Array.isArray(parsed) ? parsed : getDefaultGoals();
       }
     } catch (error) {
       console.error('Failed to load goals from localStorage:', error);
     }
   }
-  // Return demo goals as fallback
-  return mockGoals;
+  // Return default goals if localStorage is not available or empty
+  return getDefaultGoals();
 };
 
 export const createGoal = (goal: Omit<SavingsGoal, 'id' | 'createdAt' | 'updatedAt'>): SavingsGoal => {
+  const goals = loadGoals();
   const newGoal: SavingsGoal = {
     ...goal,
     id: `goal_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -68,30 +70,34 @@ export const createGoal = (goal: Omit<SavingsGoal, 'id' | 'createdAt' | 'updated
     updatedAt: new Date().toISOString(),
   };
   
-  mockGoals.push(newGoal);
+  goals.push(newGoal);
+  saveGoals(goals);
   return newGoal;
 };
 
 export const updateGoal = (id: string, updates: Partial<SavingsGoal>): SavingsGoal | null => {
-  const goalIndex = mockGoals.findIndex(g => g.id === id);
+  const goals = loadGoals();
+  const goalIndex = goals.findIndex(g => g.id === id);
   
   if (goalIndex === -1) return null;
   
-  mockGoals[goalIndex] = {
-    ...mockGoals[goalIndex],
+  goals[goalIndex] = {
+    ...goals[goalIndex],
     ...updates,
     updatedAt: new Date().toISOString(),
   };
   
-  return mockGoals[goalIndex];
+  saveGoals(goals);
+  return goals[goalIndex];
 };
 
 export const deleteGoal = (id: string): boolean => {
-  const initialLength = mockGoals.length;
-  const index = mockGoals.findIndex(g => g.id === id);
+  const goals = loadGoals();
+  const initialLength = goals.length;
+  const filteredGoals = goals.filter(g => g.id !== id);
   
-  if (index !== -1) {
-    mockGoals.splice(index, 1);
+  if (filteredGoals.length < initialLength) {
+    saveGoals(filteredGoals);
     return true;
   }
   

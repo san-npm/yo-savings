@@ -10,17 +10,19 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Design System Colors
-        background: '#0f172a', // slate-900
-        card: '#18181B', // zinc-900
-        border: '#27272A', // zinc-800
-        'border-hover': '#3F3F46', // zinc-700
-        primary: '#10B981', // emerald-500 (money green)
-        secondary: '#6366F1', // indigo-500
-        success: '#10B981',
-        error: '#EF4444',
-        'text-primary': '#FAFAFA', // zinc-50
-        'text-secondary': '#A1A1AA', // zinc-400
+        // Light Theme Design System Colors
+        background: '#F8FAFC', // slate-50, very light gray
+        card: '#FFFFFF', // pure white
+        border: '#E2E8F0', // slate-200, subtle borders
+        'border-hover': '#CBD5E1', // slate-300, hover borders
+        primary: '#22C55E', // green-500, primary actions
+        'primary-hover': '#16A34A', // green-600, hover state
+        secondary: '#6366F1', // indigo-500, secondary actions
+        success: '#22C55E', // green-500, for money/earnings
+        error: '#EF4444', // red-500
+        'text-primary': '#1E293B', // slate-800, main text
+        'text-secondary': '#64748B', // slate-500, secondary text
+        'text-muted': '#94A3B8', // slate-400, muted text
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],

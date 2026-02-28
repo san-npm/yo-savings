@@ -10,7 +10,7 @@ export function Skeleton({ className }: SkeletonProps) {
   return (
     <div
       className={cn(
-        'animate-pulse rounded-xl bg-zinc-800/50',
+        'animate-pulse rounded-xl bg-slate-200',
         className
       )}
     />
@@ -28,17 +28,18 @@ export function BalanceSkeleton() {
 
 export function AccountRowSkeleton() {
   return (
-    <div className="flex items-center justify-between p-4 rounded-2xl border border-zinc-800">
-      <div className="flex items-center space-x-3">
-        <Skeleton className="w-10 h-10 rounded-full" />
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-3 w-16" />
+    <div className="bg-white rounded-2xl shadow-sm p-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-3">
+          <Skeleton className="w-8 h-8 rounded-full" />
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-3 w-16" />
+          </div>
         </div>
-      </div>
-      <div className="text-right space-y-2">
-        <Skeleton className="h-4 w-20" />
-        <Skeleton className="h-3 w-12" />
+        <div className="text-right space-y-2">
+          <Skeleton className="h-4 w-20" />
+        </div>
       </div>
     </div>
   );

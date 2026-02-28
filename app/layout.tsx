@@ -15,6 +15,12 @@ export const metadata: Metadata = {
   description: 'Open a savings account in 30 seconds. Earn up to 12% per year.',
   keywords: ['savings', 'interest', 'earn', 'money', 'finance'],
   authors: [{ name: 'Stash Team' }],
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Stash',
+  },
   icons: {
     icon: '/favicon.ico',
     apple: '/apple-icon.png',
@@ -25,7 +31,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-  themeColor: '#09090B',
+  themeColor: '#F8FAFC',
 };
 
 export default function RootLayout({
@@ -34,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} dark`}>
+    <html lang="en" className={`${inter.variable}`}>
       <body style={{ minHeight: '100vh' }}>
         <ClientOnly>
           <Providers>
@@ -46,6 +52,15 @@ export default function RootLayout({
             </div>
           </Providers>
         </ClientOnly>
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.register('/sw.js')
+                .then(() => console.log('Service Worker registered'))
+                .catch(() => console.log('Service Worker registration failed'));
+            }
+          `
+        }} />
       </body>
     </html>
   );

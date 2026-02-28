@@ -22,12 +22,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <PrivyProvider
-      appId="clpispdty00ycl80fpueukbhl"
+      appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID!}
       config={{
         loginMethods: ['email'],
         appearance: {
-          theme: 'dark',
-          accentColor: '#10B981',
+          theme: 'light',
+          accentColor: '#22C55E',
           logo: undefined,
         },
         embeddedWallets: {

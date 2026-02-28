@@ -1,57 +1,40 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useAccount } from 'wagmi';
 import { useVaults, useUserBalance, useVaultHistory } from '@yo-protocol/react';
+import { useYoClient } from '@/lib/useYoClient';
 
 import { getAccountById, type AccountId } from '@/lib/accounts';
 import { EarningsChart } from '@/components/EarningsChart';
 import { formatBalance, formatPercentage, formatDateRelative } from '@/lib/format';
+import { CurrencyIcon } from '@/components/CurrencyIcon';
 
 // Helper function to get APY (placeholder until YO SDK provides this)
 const getVaultAPY = (symbol?: string) => {
   const apyMap: Record<string, number> = {
     yoUSD: 8.5,
     yoEUR: 7.2,
-    yoBTC: 5.8,
-    yoETH: 6.5,
-    yoGOLD: 4.2,
   };
   return symbol ? apyMap[symbol] : 0;
 };
 
-// Mock transaction history
-const mockTransactions = [
-  {
-    id: '1',
-    type: 'deposit' as const,
-    amount: 500,
-    timestamp: '2024-02-25T10:30:00Z',
-    status: 'completed' as const,
-  },
-  {
-    id: '2', 
-    type: 'deposit' as const,
-    amount: 1000,
-    timestamp: '2024-02-20T15:45:00Z',
-    status: 'completed' as const,
-  },
-  {
-    id: '3',
-    type: 'withdrawal' as const,
-    amount: 200,
-    timestamp: '2024-02-18T09:15:00Z',
-    status: 'completed' as const,
-  },
-];
+interface Transaction {
+  id: string;
+  type: 'deposit' | 'withdrawal';
+  amount: number;
+  timestamp: number;
+  status: 'completed';
+}
 
 export default function AccountDetailPage() {
   const params = useParams();
   const accountId = params.id as AccountId;
-  const { address } = useAccount();
+  const { getClient, address } = useYoClient();
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [transactionsLoading, setTransactionsLoading] = useState(true);
   
   const account = getAccountById(accountId);
   const { vaults, isLoading: vaultsLoading } = useVaults();
@@ -59,10 +42,44 @@ export default function AccountDetailPage() {
   const { position, isLoading: balanceLoading } = useUserBalance(account.vaultAddress as `0x${string}`, address);
   const { yieldHistory, isLoading: historyLoading } = useVaultHistory(account.vaultAddress as `0x${string}`);
 
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      if (!address) return;
+      
+      try {
+        setTransactionsLoading(true);
+        const client = await getClient();
+        
+        const history = await client.getUserHistory(
+          account.vaultAddress as `0x${string}`,
+          address,
+          5 // Limit to last 5 transactions
+        );
+
+        const formattedTransactions = history.map((tx: any) => ({
+          id: tx.transactionHash,
+          type: (tx.type === 'deposit' ? 'deposit' : 'withdrawal') as 'deposit' | 'withdrawal',
+          amount: Number(tx.amount) / 1e6, // Convert from 6 decimals
+          timestamp: tx.timestamp,
+          status: 'completed' as const,
+        }));
+
+        setTransactions(formattedTransactions);
+      } catch (error) {
+        console.error('Error fetching transactions:', error);
+        setTransactions([]);
+      } finally {
+        setTransactionsLoading(false);
+      }
+    };
+
+    fetchTransactions();
+  }, [address, account.vaultAddress, getClient]);
+
   if (!account) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-zinc-400">Account not found</p>
+        <p className="text-slate-400">Account not found</p>
       </div>
     );
   }
@@ -82,11 +99,13 @@ export default function AccountDetailPage() {
       <div className="flex items-center justify-between">
         <Link
           href="/"
-          className="p-2 hover:bg-zinc-800/50 rounded-xl transition-colors"
+          className="p-2 hover:bg-slate-100 rounded-xl transition-colors"
         >
-          <span className="text-xl">←</span>
+          <svg className="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
         </Link>
-        <h1 className="text-lg font-medium text-zinc-200">Account Details</h1>
+        <h1 className="text-lg font-medium text-slate-800">Account Details</h1>
         <div className="w-8" /> {/* Spacer */}
       </div>
 
@@ -95,32 +114,30 @@ export default function AccountDetailPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="p-6 bg-zinc-900/50 backdrop-blur-sm rounded-2xl border border-zinc-800/50"
+        className="p-6 bg-white backdrop-blur-sm rounded-2xl shadow-sm"
       >
         <div className="flex items-center space-x-4 mb-6">
-          <div className="w-12 h-12 flex items-center justify-center bg-zinc-800/50 rounded-full text-xl">
-            {account.icon}
-          </div>
+          <CurrencyIcon accountId={account.id} size="lg" />
           <div>
-            <h2 className="text-xl font-semibold text-zinc-200">
+            <h2 className="text-xl font-semibold text-slate-800">
               {account.displayName}
             </h2>
             <div className="flex items-center space-x-2">
-              <span className="text-sm text-emerald-500 font-medium">
+              <span className="text-sm text-green-500 font-medium">
                 {formatPercentage(annualRate)} annual rate
               </span>
-              <div className="w-1 h-1 bg-zinc-600 rounded-full" />
-              <span className="text-sm text-zinc-500">Earning daily</span>
+              <div className="w-1 h-1 bg-slate-300 rounded-full" />
+              <span className="text-sm text-slate-400">Earning daily</span>
             </div>
           </div>
         </div>
 
         {/* Balance */}
         <div className="space-y-2 mb-6">
-          <p className="text-sm text-zinc-400">Current Balance</p>
-          <div className="text-4xl font-semibold text-zinc-200 tabular-nums">
+          <p className="text-sm text-slate-500">Current Balance</p>
+          <div className="text-4xl font-semibold text-slate-800 tabular-nums">
             {isLoading ? (
-              <div className="w-32 h-10 bg-zinc-800/50 rounded animate-pulse" />
+              <div className="w-32 h-10 bg-slate-200 rounded animate-pulse" />
             ) : (
               formatBalance(balance, accountId)
             )}
@@ -153,7 +170,7 @@ export default function AccountDetailPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="p-6 bg-zinc-900/30 rounded-2xl border border-zinc-800/50"
+        className="p-6 bg-white rounded-2xl shadow-sm"
       >
         <EarningsChart
           data={(yieldHistory || []).map((point: { timestamp: number; value: number }, i: number) => ({
@@ -173,49 +190,75 @@ export default function AccountDetailPage() {
         transition={{ delay: 0.3 }}
         className="space-y-4"
       >
-        <h3 className="text-lg font-medium text-zinc-200">Recent Activity</h3>
+        <h3 className="text-lg font-medium text-slate-800">Recent Activity</h3>
         
         <div className="space-y-3">
-          {mockTransactions.length === 0 ? (
-            <div className="p-8 text-center bg-zinc-900/20 rounded-2xl border border-zinc-800/30">
-              <div className="text-3xl mb-2">📄</div>
-              <p className="text-sm text-zinc-500">No transactions yet</p>
-              <p className="text-xs text-zinc-600">Your activity will appear here</p>
+          {transactionsLoading ? (
+            // Loading skeleton
+            [...Array(3)].map((_, i) => (
+              <div key={i} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 animate-pulse">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-slate-200 rounded-full" />
+                  <div className="space-y-1">
+                    <div className="w-16 h-4 bg-slate-200 rounded" />
+                    <div className="w-24 h-3 bg-slate-200 rounded" />
+                  </div>
+                </div>
+                <div className="w-16 h-4 bg-slate-200 rounded" />
+              </div>
+            ))
+          ) : transactions.length === 0 ? (
+            <div className="p-8 text-center bg-slate-50 rounded-2xl border border-slate-100">
+              <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mb-2 mx-auto">
+                <svg className="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <p className="text-sm text-slate-500">No transactions yet</p>
+              <p className="text-xs text-slate-400">Your activity will appear here</p>
             </div>
           ) : (
-            mockTransactions.map((tx, index) => (
+            transactions.map((tx, index) => (
               <motion.div
                 key={tx.id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.4 + index * 0.1 }}
-                className="flex items-center justify-between p-4 bg-zinc-900/20 rounded-xl border border-zinc-800/30"
+                className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100"
               >
                 <div className="flex items-center space-x-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                     tx.type === 'deposit'
-                      ? 'bg-emerald-500/20 text-emerald-500'
-                      : 'bg-zinc-700/50 text-zinc-400'
+                      ? 'bg-green-100 text-green-500'
+                      : 'bg-slate-100 text-slate-500'
                   }`}>
-                    {tx.type === 'deposit' ? '↓' : '↑'}
+                    {tx.type === 'deposit' ? (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m0 0l-4-4m4 4l4-4" />
+                      </svg>
+                    ) : (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 20V4m0 0l4 4m-4-4l-4 4" />
+                      </svg>
+                    )}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-zinc-200 capitalize">
+                    <p className="text-sm font-medium text-slate-800 capitalize">
                       {tx.type}
                     </p>
-                    <p className="text-xs text-zinc-500">
-                      {formatDateRelative(tx.timestamp)}
+                    <p className="text-xs text-slate-500">
+                      {new Date(tx.timestamp * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     </p>
                   </div>
                 </div>
                 
                 <div className="text-right">
                   <div className={`text-sm font-semibold tabular-nums ${
-                    tx.type === 'deposit' ? 'text-emerald-500' : 'text-zinc-400'
+                    tx.type === 'deposit' ? 'text-green-500' : 'text-slate-500'
                   }`}>
                     {tx.type === 'deposit' ? '+' : '-'}{formatBalance(tx.amount, accountId)}
                   </div>
-                  <div className="text-xs text-zinc-500 capitalize">
+                  <div className="text-xs text-slate-500 capitalize">
                     {tx.status}
                   </div>
                 </div>
@@ -230,15 +273,19 @@ export default function AccountDetailPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="p-4 bg-zinc-900/20 rounded-xl border border-zinc-800/30"
+        className="p-4 bg-slate-50 rounded-xl border border-slate-200"
       >
         <div className="flex items-center space-x-2 mb-2">
-          <span className="text-sm">🔒</span>
-          <span className="text-sm font-medium text-zinc-300">Secured by YO Protocol</span>
+          <div className="w-5 h-5 bg-green-500/20 rounded-full flex items-center justify-center">
+            <svg className="w-3 h-3 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </div>
+          <span className="text-sm font-medium text-slate-700">Institutional-grade security</span>
         </div>
-        <p className="text-xs text-zinc-500">
+        <p className="text-xs text-slate-400">
           Your funds are always yours. Withdraw anytime with no fees.{' '}
-          <a href="#" className="text-emerald-500 hover:text-emerald-400 underline">
+          <a href="#" className="text-green-500 hover:text-green-400 underline">
             View audit reports
           </a>
         </p>

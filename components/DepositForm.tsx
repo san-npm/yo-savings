@@ -5,10 +5,11 @@ import { motion } from 'framer-motion';
 import type { SavingsAccount } from '@/lib/accounts';
 import { parseAmountInput } from '@/lib/format';
 import { Confetti } from './Confetti';
+import { CurrencyIcon } from './CurrencyIcon';
 
 interface DepositFormProps {
   account: SavingsAccount;
-  onDeposit: (amount: number) => Promise<void>;
+  onDeposit: (amount: string) => Promise<{ hash: string }>;
   isLoading?: boolean;
 }
 
@@ -19,6 +20,8 @@ export function DepositForm({ account, onDeposit, isLoading = false }: DepositFo
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [successAmount, setSuccessAmount] = useState(0);
+  const [txHash, setTxHash] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleAmountChange = (value: string) => {
     // Allow only numbers and decimal point
@@ -44,15 +47,17 @@ export function DepositForm({ account, onDeposit, isLoading = false }: DepositFo
     if (parsedAmount <= 0) return;
 
     setIsSubmitting(true);
+    setError(null);
     setSuccessAmount(parsedAmount);
     
     try {
-      await onDeposit(parsedAmount);
+      const result = await onDeposit(amount);
+      setTxHash(result.hash);
       setShowSuccess(true);
       setAmount('');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Deposit failed:', error);
-      // In real app, show error message
+      setError(error?.message || 'Deposit failed. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -77,24 +82,34 @@ export function DepositForm({ account, onDeposit, isLoading = false }: DepositFo
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-          className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center"
+          className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center"
         >
           <span className="text-2xl">✅</span>
         </motion.div>
         
-        <div className="text-center">
-          <h2 className="text-xl font-semibold text-zinc-200 mb-2">
+        <div className="text-center space-y-2">
+          <h2 className="text-xl font-semibold text-slate-800 mb-2">
             Done!
           </h2>
-          <p className="text-zinc-400">
+          <p className="text-slate-600">
             {account.currencySymbol}{successAmount} added to {account.displayName}
           </p>
+          {txHash && (
+            <a
+              href={`https://basescan.org/tx/${txHash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-green-600 hover:text-green-700 underline"
+            >
+              View transaction
+            </a>
+          )}
         </div>
         
         <motion.button
           whileTap={{ scale: 0.95 }}
           onClick={() => setShowSuccess(false)}
-          className="px-6 py-3 bg-emerald-500 text-white font-medium rounded-xl hover:bg-emerald-600 transition-colors"
+          className="px-6 py-3 bg-green-500 text-white font-medium rounded-xl hover:bg-green-600 transition-colors"
         >
           Done
         </motion.button>
@@ -110,19 +125,17 @@ export function DepositForm({ account, onDeposit, isLoading = false }: DepositFo
       className="space-y-8"
     >
       {/* Account Header */}
-      <div className="flex items-center space-x-3 p-4 bg-zinc-900/30 rounded-2xl border border-zinc-800/50">
-        <div className="w-10 h-10 flex items-center justify-center bg-zinc-800/50 rounded-full text-lg">
-          {account.icon}
-        </div>
+      <div className="flex items-center space-x-3 p-4 bg-white rounded-2xl shadow-sm">
+        <CurrencyIcon accountId={account.id} />
         <div>
-          <h2 className="font-medium text-zinc-200">{account.displayName}</h2>
-          <p className="text-sm text-zinc-500">Add money to start earning</p>
+          <h2 className="font-medium text-slate-800">{account.displayName}</h2>
+          <p className="text-sm text-slate-500">Add money to start earning</p>
         </div>
       </div>
 
       {/* Amount Input */}
       <div className="space-y-4">
-        <label className="block text-sm font-medium text-zinc-400">
+        <label className="block text-sm font-medium text-slate-600">
           Amount
         </label>
         
@@ -132,29 +145,36 @@ export function DepositForm({ account, onDeposit, isLoading = false }: DepositFo
             value={amount}
             onChange={(e) => handleAmountChange(e.target.value)}
             placeholder="0.00"
-            className="w-full text-4xl font-semibold text-center bg-transparent text-zinc-200 placeholder-zinc-600 border-none outline-none tabular-nums"
+            className="w-full text-4xl font-semibold text-center bg-transparent text-slate-800 placeholder-slate-400 border-none outline-none tabular-nums"
             autoFocus
           />
-          <div className="absolute left-1/2 transform -translate-x-1/2 -top-8 text-2xl text-zinc-400">
+          <div className="absolute left-1/2 transform -translate-x-1/2 -top-8 text-2xl text-slate-500">
             {account.currencySymbol}
           </div>
         </div>
 
         {/* Quick Amounts */}
-        <div className="grid grid-cols-4 gap-2">
+        <div className="flex flex-wrap gap-2 justify-center">
           {quickAmounts.map((quickAmount) => (
             <motion.button
               key={quickAmount}
               type="button"
               whileTap={{ scale: 0.95 }}
               onClick={() => handleQuickAmount(quickAmount)}
-              className="py-2 px-3 text-sm font-medium text-zinc-400 bg-zinc-800/50 rounded-xl hover:bg-zinc-700/50 hover:text-zinc-300 transition-colors"
+              className="py-1.5 px-4 text-sm font-medium text-slate-600 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors"
             >
               {account.currencySymbol}{quickAmount}
             </motion.button>
           ))}
         </div>
       </div>
+
+      {/* Error Display */}
+      {error && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded-xl">
+          <p className="text-sm text-red-600">{error}</p>
+        </div>
+      )}
 
       {/* Deposit Button */}
       <motion.button
@@ -163,8 +183,8 @@ export function DepositForm({ account, onDeposit, isLoading = false }: DepositFo
         whileTap={{ scale: isValid ? 0.95 : 1 }}
         className={`w-full h-12 rounded-xl font-medium transition-all ${
           isValid
-            ? 'bg-emerald-500 text-white hover:bg-emerald-600'
-            : 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
+            ? 'bg-green-500 text-white hover:bg-green-600'
+            : 'bg-slate-200 text-slate-400 cursor-not-allowed'
         }`}
       >
         {isSubmitting ? (
@@ -182,9 +202,9 @@ export function DepositForm({ account, onDeposit, isLoading = false }: DepositFo
       </motion.button>
 
       {/* Info */}
-      <div className="text-center text-xs text-zinc-500 space-y-1">
+      <div className="text-center text-xs text-slate-500 space-y-1">
         <p>Your deposit will start earning immediately</p>
-        <p>Secured by YO Protocol • Withdraw anytime</p>
+        <p>Secured by institutional-grade protocols • Withdraw anytime</p>
       </div>
     </motion.form>
   );
