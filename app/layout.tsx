@@ -54,10 +54,23 @@ export default function RootLayout({
         </ClientOnly>
         <script dangerouslySetInnerHTML={{
           __html: `
+            // Recover from chunk load failures (stale cache or adblocker)
+            window.addEventListener('error', function(e) {
+              if (e.message && (e.message.includes('ChunkLoadError') || e.message.includes('Failed to load chunk') || e.message.includes('Loading chunk'))) {
+                if (!sessionStorage.getItem('chunk_reload')) {
+                  sessionStorage.setItem('chunk_reload', '1');
+                  window.location.reload();
+                }
+              }
+            });
+            // Register service worker
             if ('serviceWorker' in navigator) {
               navigator.serviceWorker.register('/sw.js')
-                .then(() => console.log('Service Worker registered'))
-                .catch(() => console.log('Service Worker registration failed'));
+                .then(function(reg) {
+                  // Force update check on page load
+                  reg.update();
+                })
+                .catch(function() {});
             }
           `
         }} />
