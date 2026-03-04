@@ -40,7 +40,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     >
       <WagmiProvider config={config}>
         <QueryClientProvider client={queryClient}>
-          <YieldProvider>
+          <YieldProvider partnerId="9999" defaultSlippageBps={50}>
             {children}
           </YieldProvider>
         </QueryClientProvider>

@@ -1,24 +1,55 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { usePrivy, useLogin, useWallets } from '@privy-io/react-auth';
 import { useVaults, useUserBalance } from '@yo-protocol/react';
+import { useVaultSnapshot } from '@/lib/useVaultSnapshot';
 import { useYoClient } from '@/lib/useYoClient';
 
 import { BalanceCard } from '@/components/BalanceCard';
 import { AccountRow } from '@/components/AccountRow';
-import { getAllAccounts } from '@/lib/accounts';
+import { getAllAccounts, type SavingsAccount } from '@/lib/accounts';
 
-// Helper function to get APY (placeholder until YO SDK provides this)
-const getVaultAPY = (symbol?: string) => {
-  const apyMap: Record<string, number> = {
-    yoUSD: 8.5,
-    yoEUR: 7.2,
-  };
-  return symbol ? apyMap[symbol] : 0;
-};
+// Extracted component to safely use hooks per-account (no hooks in loops)
+function AccountWithData({
+  account,
+  address,
+  index,
+  onData,
+}: {
+  account: SavingsAccount;
+  address?: `0x${string}`;
+  index: number;
+  onData: (id: string, balance: number, apy: number) => void;
+}) {
+  const { position, isLoading: balanceLoading } = useUserBalance(
+    account.vaultAddress as `0x${string}`,
+    address
+  );
+  const { snapshot, isLoading: snapshotLoading } = useVaultSnapshot(
+    account.vaultAddress as `0x${string}`
+  );
+
+  const balance = Number(position?.assets || BigInt(0)) / 1e6;
+  const annualRate = parseFloat(snapshot?.stats?.yield?.['7d'] ?? '0');
+
+  useEffect(() => {
+    onData(account.id, balance, annualRate);
+  }, [account.id, balance, annualRate, onData]);
+
+  return (
+    <AccountRow
+      key={account.id}
+      account={account}
+      balance={balance}
+      annualRate={annualRate}
+      isLoading={balanceLoading || snapshotLoading}
+      index={index}
+    />
+  );
+}
 
 interface RecentTransaction {
   id: string;
@@ -31,86 +62,75 @@ interface RecentTransaction {
 
 export default function HomePage() {
   const { wallets } = useWallets();
-  const { ready, authenticated, user, logout } = usePrivy();
+  const { ready, authenticated, user } = usePrivy();
   const { login } = useLogin();
-  const { getClient } = useYoClient();
-  
-  // Get embedded wallet address
+  const { client } = useYoClient();
+
   const embeddedWallet = wallets.find(w => w.walletClientType === 'privy');
   const address = embeddedWallet?.address as `0x${string}` | undefined;
   const [userName, setUserName] = useState('');
   const [recentTransactions, setRecentTransactions] = useState<RecentTransaction[]>([]);
   const [transactionsLoading, setTransactionsLoading] = useState(false);
-  
-  const { vaults, isLoading: vaultsLoading } = useVaults();
-  
-  // Get all accounts with their data (only dollar and euro)
-  const accounts = getAllAccounts().filter(account => ['dollar', 'euro'].includes(account.id));
-  const accountsWithData = accounts.map(account => {
-    // Map vault data from real YO SDK response
-    const vault = vaults?.find(v => v.address.toLowerCase() === account.vaultAddress.toLowerCase());
-    const { position, isLoading: balanceLoading } = useUserBalance(account.vaultAddress as `0x${string}`, address);
-    
-    return {
-      ...account,
-      balance: Number(position?.assets || BigInt(0)),
-      annualRate: getVaultAPY(vault?.symbol),
-      isLoading: vaultsLoading || balanceLoading,
-    };
-  });
 
-  // Calculate totals (convert everything to USD for simplicity)
-  const totalBalance = accountsWithData.reduce((total, account) => {
-    // In real app, would convert using actual exchange rates
-    // USD/EUR roughly equal for demo
-    return total + account.balance;
-  }, 0);
+  // Track per-account data for totals
+  const [accountData, setAccountData] = useState<Record<string, { balance: number; apy: number }>>({});
 
-  // Simple monthly earnings estimate (balance * average APY / 12)
-  const averageAPY = accountsWithData.length > 0 
-    ? accountsWithData.reduce((sum, acc) => sum + acc.annualRate, 0) / accountsWithData.length 
+  const handleAccountData = useMemo(
+    () => (id: string, balance: number, apy: number) => {
+      setAccountData(prev => {
+        if (prev[id]?.balance === balance && prev[id]?.apy === apy) return prev;
+        return { ...prev, [id]: { balance, apy } };
+      });
+    },
+    []
+  );
+
+  const accounts = getAllAccounts();
+
+  // Calculate totals from collected account data
+  const totalBalance = Object.values(accountData).reduce((sum, d) => sum + d.balance, 0);
+  const averageAPY = Object.keys(accountData).length > 0
+    ? Object.values(accountData).reduce((sum, d) => sum + d.apy, 0) / Object.keys(accountData).length
     : 0;
   const monthlyEarnings = (totalBalance * averageAPY / 100) / 12;
+
+  const { vaults, isLoading: vaultsLoading } = useVaults();
 
   // Fetch recent transactions
   useEffect(() => {
     const fetchRecentTransactions = async () => {
-      if (!address) return;
-      
+      if (!address || !client) return;
+
       try {
         setTransactionsLoading(true);
-        const client = await getClient();
         const allTransactions: RecentTransaction[] = [];
 
-        // Fetch recent history from both vaults
         for (const account of getAllAccounts()) {
           try {
             const history = await client.getUserHistory(
               account.vaultAddress as `0x${string}`,
               address,
-              3 // Limit to last 3 transactions per vault
+              3
             );
 
-            const accountTransactions = history.slice(0, 3).map((tx: any) => ({
-              id: tx.transactionHash,
+            const accountTransactions = history.slice(0, 3).map((tx) => ({
+              id: tx.txHash,
               type: (tx.type === 'deposit' ? 'deposit' : 'withdraw') as 'deposit' | 'withdraw',
-              amount: Number(tx.amount) / 1e6, // Convert from 6 decimals
+              amount: Number(tx.assets.raw) / 1e6,
               account: account.displayName,
               date: formatTransactionDate(tx.timestamp),
               status: 'completed' as const,
             }));
 
             allTransactions.push(...accountTransactions);
-          } catch (error) {
-            console.error(`Error fetching recent transactions for ${account.displayName}:`, error);
+          } catch {
+            // Continue with other vaults
           }
         }
 
-        // Sort by timestamp and take first 3
         allTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
         setRecentTransactions(allTransactions.slice(0, 3));
-      } catch (error) {
-        console.error('Error fetching recent transactions:', error);
+      } catch {
         setRecentTransactions([]);
       } finally {
         setTransactionsLoading(false);
@@ -118,10 +138,9 @@ export default function HomePage() {
     };
 
     fetchRecentTransactions();
-  }, [address, getClient]);
+  }, [address, client]);
 
   useEffect(() => {
-    // Use email from Privy user or fallback to address
     if (user?.email) {
       setUserName(user.email.address.split('@')[0]);
     } else if (address) {
@@ -133,7 +152,7 @@ export default function HomePage() {
     const date = new Date(timestamp * 1000);
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
+
     if (diffInHours < 1) return 'Just now';
     if (diffInHours < 24) return `${diffInHours}h ago`;
     if (diffInHours < 48) return '1 day ago';
@@ -154,15 +173,14 @@ export default function HomePage() {
           transition={{ delay: 0.2 }}
           className="text-center space-y-8 max-w-md"
         >
-          {/* Hero */}
           <div>
             <motion.div
               className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4 mx-auto"
-              animate={{ 
+              animate={{
                 rotate: [0, 5, -5, 0],
                 scale: [1, 1.1, 1]
               }}
-              transition={{ 
+              transition={{
                 duration: 3,
                 repeat: Infinity,
                 repeatType: "reverse"
@@ -172,18 +190,17 @@ export default function HomePage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
               </svg>
             </motion.div>
-            
+
             <h1 className="text-3xl font-bold text-slate-800 mb-4">
               Your savings,<br />earning more
             </h1>
-            
+
             <p className="text-lg text-slate-600 mb-8">
               Open a savings account in 30 seconds.<br />
-              Earn up to <span className="text-green-500 font-semibold">12% per year</span>.
+              Earn competitive interest rates, <span className="text-green-500 font-semibold">automatically</span>.
             </p>
           </div>
 
-          {/* Connect Button */}
           <div className="space-y-4">
             <motion.button
               whileTap={{ scale: 0.95 }}
@@ -193,9 +210,9 @@ export default function HomePage() {
             >
               Get Started
             </motion.button>
-            
+
             <p className="text-xs text-slate-500">
-              Simple and secure • Protected by institutional-grade security
+              Simple and secure &bull; Powered by audited protocols
             </p>
           </div>
         </motion.div>
@@ -209,7 +226,6 @@ export default function HomePage() {
       animate={{ opacity: 1 }}
       className="space-y-6"
     >
-      {/* Total Balance Card */}
       <BalanceCard
         totalBalance={totalBalance}
         monthlyEarnings={monthlyEarnings}
@@ -217,7 +233,6 @@ export default function HomePage() {
         isLoading={vaultsLoading}
       />
 
-      {/* Savings Accounts List */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-slate-800">
@@ -232,14 +247,13 @@ export default function HomePage() {
         </div>
 
         <div className="space-y-3">
-          {accountsWithData.map((account, index) => (
-            <AccountRow
+          {accounts.map((account, index) => (
+            <AccountWithData
               key={account.id}
               account={account}
-              balance={account.balance}
-              annualRate={account.annualRate}
-              isLoading={account.isLoading}
+              address={address}
               index={index}
+              onData={handleAccountData}
             />
           ))}
         </div>
@@ -293,7 +307,6 @@ export default function HomePage() {
 
         <div className="space-y-3">
           {transactionsLoading ? (
-            // Loading skeleton
             [...Array(3)].map((_, i) => (
               <div key={i} className="flex items-center justify-between p-3 bg-white rounded-xl shadow-sm animate-pulse">
                 <div className="flex items-center space-x-3">
@@ -322,8 +335,8 @@ export default function HomePage() {
               >
                 <div className="flex items-center space-x-3">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    transaction.type === 'deposit' 
-                      ? 'bg-green-100 text-green-600' 
+                    transaction.type === 'deposit'
+                      ? 'bg-green-100 text-green-600'
                       : 'bg-slate-100 text-slate-600'
                   }`}>
                     {transaction.type === 'deposit' ? '↓' : '↑'}
@@ -333,7 +346,7 @@ export default function HomePage() {
                       {transaction.type === 'deposit' ? 'Deposit' : 'Withdraw'}
                     </p>
                     <p className="text-xs text-slate-500">
-                      {transaction.account} • {transaction.date}
+                      {transaction.account} &bull; {transaction.date}
                     </p>
                   </div>
                 </div>
@@ -350,7 +363,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Insights Card - Only show if user has funds */}
+      {/* Insights Card */}
       {totalBalance > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -366,7 +379,7 @@ export default function HomePage() {
             <div>
               <h3 className="font-medium text-slate-800">Earning Interest</h3>
               <p className="text-sm text-slate-600">
-                Your ${totalBalance.toLocaleString()} is earning interest daily. 
+                Your ${totalBalance.toLocaleString(undefined, { maximumFractionDigits: 2 })} is earning interest daily.
                 Keep saving to reach your goals faster.
               </p>
             </div>
@@ -374,7 +387,6 @@ export default function HomePage() {
         </motion.div>
       )}
 
-      {/* Bottom spacing for nav */}
       <div className="pb-20" />
     </motion.div>
   );

@@ -2,42 +2,51 @@
 
 import { motion } from 'framer-motion';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
-import { useVaults, useUserBalance } from '@yo-protocol/react';
+import { useUserBalance } from '@yo-protocol/react';
+import { useVaultSnapshot } from '@/lib/useVaultSnapshot';
 import { AccountRow } from '@/components/AccountRow';
-import { getAllAccounts } from '@/lib/accounts';
+import { getAllAccounts, type SavingsAccount } from '@/lib/accounts';
 
-// Helper function to get APY (placeholder until YO SDK provides this)
-const getVaultAPY = (symbol?: string) => {
-  const apyMap: Record<string, number> = {
-    yoUSD: 8.5,
-    yoEUR: 7.2,
-  };
-  return symbol ? apyMap[symbol] : 0;
-};
+// Extracted component to safely call hooks per-account
+function AccountWithBalance({
+  account,
+  address,
+  index,
+}: {
+  account: SavingsAccount;
+  address?: `0x${string}`;
+  index: number;
+}) {
+  const { position, isLoading: balanceLoading } = useUserBalance(
+    account.vaultAddress as `0x${string}`,
+    address
+  );
+  const { snapshot, isLoading: snapshotLoading } = useVaultSnapshot(
+    account.vaultAddress as `0x${string}`
+  );
+
+  const balance = Number(position?.assets || BigInt(0)) / 1e6;
+  const annualRate = parseFloat(snapshot?.stats?.yield?.['7d'] ?? '0');
+
+  return (
+    <AccountRow
+      account={account}
+      balance={balance}
+      annualRate={annualRate}
+      isLoading={balanceLoading || snapshotLoading}
+      index={index}
+    />
+  );
+}
 
 export default function AccountsPage() {
   const { wallets } = useWallets();
   const { authenticated } = usePrivy();
-  const { vaults, isLoading: vaultsLoading } = useVaults();
-  
-  // Get embedded wallet address
+
   const embeddedWallet = wallets.find(w => w.walletClientType === 'privy');
   const address = embeddedWallet?.address as `0x${string}` | undefined;
-  
-  // Get only dollar and euro accounts
-  const accounts = getAllAccounts().filter(account => ['dollar', 'euro'].includes(account.id));
-  const accountsWithData = accounts.map(account => {
-    // Map vault data from real YO SDK response
-    const vault = vaults?.find(v => v.address.toLowerCase() === account.vaultAddress.toLowerCase());
-    const { position, isLoading: balanceLoading } = useUserBalance(account.vaultAddress as `0x${string}`, address);
-    
-    return {
-      ...account,
-      balance: Number(position?.assets || BigInt(0)),
-      annualRate: getVaultAPY(vault?.symbol),
-      isLoading: vaultsLoading || balanceLoading,
-    };
-  });
+
+  const accounts = getAllAccounts();
 
   if (!authenticated) {
     return (
@@ -61,7 +70,6 @@ export default function AccountsPage() {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6"
     >
-      {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-slate-800">Savings Accounts</h1>
         <p className="text-slate-600 mt-1">
@@ -69,7 +77,6 @@ export default function AccountsPage() {
         </p>
       </div>
 
-      {/* Accounts List */}
       <div className="space-y-4">
         <div className="text-sm font-medium text-slate-500 flex items-center justify-between">
           <span>Available Accounts</span>
@@ -77,20 +84,17 @@ export default function AccountsPage() {
         </div>
 
         <div className="space-y-3">
-          {accountsWithData.map((account, index) => (
-            <AccountRow
+          {accounts.map((account, index) => (
+            <AccountWithBalance
               key={account.id}
               account={account}
-              balance={account.balance}
-              annualRate={account.annualRate}
-              isLoading={account.isLoading}
+              address={address}
               index={index}
             />
           ))}
         </div>
       </div>
 
-      {/* Summary */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -106,14 +110,13 @@ export default function AccountsPage() {
           <span className="text-sm font-medium text-slate-800">Account Summary</span>
         </div>
         <div className="space-y-1 text-xs text-slate-500">
-          <p>• All accounts earn interest daily</p>
-          <p>• No minimum balance requirements</p>
-          <p>• Withdraw anytime with no penalties</p>
-          <p>• Secured by audited smart contracts</p>
+          <p>&bull; All accounts earn interest daily</p>
+          <p>&bull; No minimum balance requirements</p>
+          <p>&bull; Withdraw anytime with no penalties</p>
+          <p>&bull; Secured by audited smart contracts</p>
         </div>
       </motion.div>
 
-      {/* Bottom spacing for nav */}
       <div className="pb-20" />
     </motion.div>
   );

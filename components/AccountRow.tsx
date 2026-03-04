@@ -60,7 +60,7 @@ export function AccountRow({
             </h3>
             <div className="flex items-center space-x-2">
               <p className="text-sm text-green-500 font-medium">
-                {formatPercentage(annualRate)} APY
+                {formatPercentage(annualRate)} annual rate
               </p>
               {balance > 0 && (
                 <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">

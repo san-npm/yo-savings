@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { parseTokenAmount, YO_GATEWAY_ADDRESS } from '@yo-protocol/core';
+import { useDeposit } from '@yo-protocol/react';
+import { parseTokenAmount, VAULTS } from '@yo-protocol/core';
 import { useYoClient } from '@/lib/useYoClient';
 
 import { getAccountById, getAllAccounts, type AccountId } from '@/lib/accounts';
@@ -12,10 +13,9 @@ import { DepositForm } from '@/components/DepositForm';
 import { CurrencyIcon } from '@/components/CurrencyIcon';
 
 export default function DepositPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const { getClient, address } = useYoClient();
-  
+  const { address } = useYoClient();
+
   const preselectedAccountId = searchParams.get('account') as AccountId | null;
   const [selectedAccountId, setSelectedAccountId] = useState<AccountId>(
     preselectedAccountId || 'dollar'
@@ -24,48 +24,27 @@ export default function DepositPage() {
   const selectedAccount = getAccountById(selectedAccountId);
   const allAccounts = getAllAccounts();
 
+  // Use the SDK's useDeposit hook — handles approval + deposit + step tracking
+  const {
+    deposit,
+    isLoading: depositLoading,
+    hash,
+    reset: resetDeposit,
+  } = useDeposit({
+    vault: selectedAccount.vaultAddress as `0x${string}`,
+    slippageBps: 50,
+    onError: (err) => {
+      console.error('Deposit failed:', err);
+    },
+  });
+
   const handleDeposit = async (amount: string) => {
-    try {
-      if (!address) throw new Error('No wallet connected');
-      
-      const client = await getClient();
-      
-      // Parse amount with 6 decimals (USDC/EURC)
-      const parsedAmount = parseTokenAmount(amount, 6);
-      
-      // Check allowance first
-      const hasAllowance = await client.hasEnoughAllowance(
-        selectedAccount.tokenAddress as `0x${string}`,
-        address,
-        YO_GATEWAY_ADDRESS,
-        parsedAmount
-      );
-      
-      // Approve if needed
-      if (!hasAllowance) {
-        const approveResult = await client.approve(
-          selectedAccount.tokenAddress as `0x${string}`,
-          parsedAmount
-        );
-        // Extract hash from result - it might be an object with a hash property
-        const approveHash = typeof approveResult === 'string' ? approveResult : approveResult.hash;
-        await client.waitForTransaction(approveHash);
-      }
-      
-      // Execute deposit
-      const depositResult = await client.deposit({
-        vault: selectedAccount.vaultAddress as `0x${string}`,
-        amount: parsedAmount
-      });
-      
-      // Extract hash from result - it might be an object with a hash property
-      const depositHash = typeof depositResult === 'string' ? depositResult : depositResult.hash;
-      
-      return { hash: depositHash };
-    } catch (error) {
-      console.error('Deposit failed:', error);
-      throw error;
-    }
+    if (!address) throw new Error('No wallet connected');
+
+    const parsedAmount = parseTokenAmount(amount, 6);
+    const txHash = await deposit(parsedAmount);
+
+    return { hash: txHash };
   };
 
   if (!address) {
@@ -88,10 +67,10 @@ export default function DepositPage() {
           href="/"
           className="p-2 hover:bg-slate-100 rounded-xl transition-colors"
         >
-          <span className="text-xl">←</span>
+          <span className="text-xl">&larr;</span>
         </Link>
         <h1 className="text-lg font-medium text-slate-800">Add Money</h1>
-        <div className="w-8" /> {/* Spacer */}
+        <div className="w-8" />
       </div>
 
       {/* Account Selector */}
@@ -105,7 +84,7 @@ export default function DepositPage() {
           <h2 className="text-sm font-medium text-slate-500">
             Choose Savings Account
           </h2>
-          
+
           <div className="space-y-2">
             {allAccounts.map((account) => (
               <motion.button
@@ -137,6 +116,8 @@ export default function DepositPage() {
         <DepositForm
           account={selectedAccount}
           onDeposit={handleDeposit}
+          isProcessing={depositLoading}
+          onReset={resetDeposit}
         />
       </motion.div>
 
@@ -153,15 +134,15 @@ export default function DepositPage() {
           </h3>
           <div className="space-y-2 text-xs text-slate-500">
             <div className="flex items-start space-x-2">
-              <span className="text-green-500 mt-0.5">•</span>
+              <span className="text-green-500 mt-0.5">&bull;</span>
               <span>Your money goes into a secure savings account</span>
             </div>
             <div className="flex items-start space-x-2">
-              <span className="text-green-500 mt-0.5">•</span>
+              <span className="text-green-500 mt-0.5">&bull;</span>
               <span>Starts earning interest immediately</span>
             </div>
             <div className="flex items-start space-x-2">
-              <span className="text-green-500 mt-0.5">•</span>
+              <span className="text-green-500 mt-0.5">&bull;</span>
               <span>Withdraw anytime with no penalties</span>
             </div>
           </div>
@@ -169,10 +150,10 @@ export default function DepositPage() {
 
         <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
           <div className="flex items-center space-x-2 mb-2">
-            <span className="text-sm font-medium text-green-500">Secure & Insured</span>
+            <span className="text-sm font-medium text-green-600">Secured by Audited Protocols</span>
           </div>
           <p className="text-xs text-slate-500">
-            Your deposits are secured by bank-grade encryption and backed by independently audited protocols.
+            Your deposits are secured by independently audited smart contracts. Your funds are always yours &mdash; withdraw anytime.
           </p>
         </div>
       </motion.div>

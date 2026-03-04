@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useUserBalance } from '@yo-protocol/react';
+import { useUserBalance, useRedeem } from '@yo-protocol/react';
 import { useYoClient } from '@/lib/useYoClient';
 import { parseTokenAmount } from '@yo-protocol/core';
 
@@ -12,21 +12,20 @@ import { getAccountById, getAllAccounts, type AccountId, type SavingsAccount } f
 import { WithdrawForm } from '@/components/WithdrawForm';
 import { CurrencyIcon } from '@/components/CurrencyIcon';
 
-// Component to handle individual account option with proper hooks usage
-function AccountOptionItem({ 
-  account, 
-  isSelected, 
-  onSelect, 
-  address 
-}: { 
-  account: SavingsAccount; 
-  isSelected: boolean; 
-  onSelect: () => void; 
-  address?: `0x${string}`; 
+function AccountOptionItem({
+  account,
+  isSelected,
+  onSelect,
+  address
+}: {
+  account: SavingsAccount;
+  isSelected: boolean;
+  onSelect: () => void;
+  address?: `0x${string}`;
 }) {
   const { position } = useUserBalance(account.vaultAddress as `0x${string}`, address);
-  const balance = Number(position?.assets || BigInt(0));
-  
+  const balance = Number(position?.assets || BigInt(0)) / 1e6;
+
   return (
     <motion.button
       whileTap={{ scale: 0.98 }}
@@ -54,10 +53,9 @@ function AccountOptionItem({
 }
 
 export default function WithdrawPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const { getClient, address } = useYoClient();
-  
+  const { client, address } = useYoClient();
+
   const preselectedAccountId = searchParams.get('account') as AccountId | null;
   const [selectedAccountId, setSelectedAccountId] = useState<AccountId>(
     preselectedAccountId || 'dollar'
@@ -65,42 +63,39 @@ export default function WithdrawPage() {
 
   const selectedAccount = getAccountById(selectedAccountId);
   const allAccounts = getAllAccounts();
-  
+
   const { position, isLoading: balanceLoading } = useUserBalance(
-    selectedAccount.vaultAddress as `0x${string}`, 
+    selectedAccount.vaultAddress as `0x${string}`,
     address
   );
-  const availableBalance = Number(position?.assets || BigInt(0));
+  const availableBalance = Number(position?.assets || BigInt(0)) / 1e6;
+
+  // Use SDK's useRedeem hook — handles share approval + redeem
+  const {
+    redeem,
+    isLoading: redeemLoading,
+    hash,
+    instant,
+    reset: resetRedeem,
+  } = useRedeem({
+    vault: selectedAccount.vaultAddress as `0x${string}`,
+    onError: (err) => {
+      console.error('Withdrawal failed:', err);
+    },
+  });
 
   const handleWithdraw = async (amount: string) => {
-    try {
-      if (!address) throw new Error('No wallet connected');
-      
-      const client = await getClient();
-      const vaultAddress = selectedAccount.vaultAddress as `0x${string}`;
-      
-      // Parse amount with 6 decimals (USDC/EURC)
-      const parsedAmount = parseTokenAmount(amount, 6);
-      
-      // Convert asset amount to shares
-      const sharesToRedeem = await client.convertToShares(vaultAddress, parsedAmount);
-      
-      // Execute redeem
-      const redeemResult = await client.redeem({
-        vault: vaultAddress,
-        shares: sharesToRedeem
-      });
-      
-      // Extract hash from result - it might be an object with a hash property
-      const redeemHash = typeof redeemResult === 'string' ? redeemResult : redeemResult.hash;
-      
-      // For now, assume all redeems are instant
-      // TODO: Implement proper queued vs instant detection based on YO SDK documentation
-      return { hash: redeemHash, instant: true };
-    } catch (error) {
-      console.error('Withdrawal failed:', error);
-      throw error;
-    }
+    if (!address || !client) throw new Error('No wallet connected');
+
+    const parsedAmount = parseTokenAmount(amount, 6);
+    const sharesToRedeem = await client.convertToShares(
+      selectedAccount.vaultAddress as `0x${string}`,
+      parsedAmount
+    );
+
+    const txHash = await redeem(sharesToRedeem);
+
+    return { hash: txHash, instant: instant ?? true };
   };
 
   if (!address) {
@@ -123,10 +118,10 @@ export default function WithdrawPage() {
           href="/"
           className="p-2 hover:bg-slate-100 rounded-xl transition-colors"
         >
-          <span className="text-xl">←</span>
+          <span className="text-xl">&larr;</span>
         </Link>
         <h1 className="text-lg font-medium text-slate-800">Withdraw</h1>
-        <div className="w-8" /> {/* Spacer */}
+        <div className="w-8" />
       </div>
 
       {/* Account Selector */}
@@ -140,7 +135,7 @@ export default function WithdrawPage() {
           <h2 className="text-sm font-medium text-slate-500">
             Choose Account to Withdraw From
           </h2>
-          
+
           <div className="space-y-2">
             {allAccounts.map((account) => (
               <AccountOptionItem
@@ -165,6 +160,9 @@ export default function WithdrawPage() {
           account={selectedAccount}
           availableBalance={availableBalance || 0}
           onWithdraw={handleWithdraw}
+          isProcessing={redeemLoading}
+          isQueued={instant === false}
+          onReset={resetRedeem}
           isLoading={balanceLoading}
         />
       </motion.div>
@@ -182,15 +180,15 @@ export default function WithdrawPage() {
           </h3>
           <div className="space-y-2 text-xs text-slate-500">
             <div className="flex items-start space-x-2">
-              <span className="text-green-500 mt-0.5">•</span>
+              <span className="text-green-500 mt-0.5">&bull;</span>
               <span>Funds available in your account instantly</span>
             </div>
             <div className="flex items-start space-x-2">
-              <span className="text-green-500 mt-0.5">•</span>
+              <span className="text-green-500 mt-0.5">&bull;</span>
               <span>No withdrawal fees or penalties</span>
             </div>
             <div className="flex items-start space-x-2">
-              <span className="text-green-500 mt-0.5">•</span>
+              <span className="text-green-500 mt-0.5">&bull;</span>
               <span>Processing typically takes 1-2 minutes</span>
             </div>
           </div>
@@ -202,15 +200,6 @@ export default function WithdrawPage() {
           </div>
           <p className="text-xs text-slate-500">
             Withdrawn funds will stop earning interest immediately. You can deposit again anytime to resume earning.
-          </p>
-        </div>
-
-        <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-          <div className="flex items-center space-x-2 mb-2">
-            <span className="text-sm font-medium text-slate-700">Tip</span>
-          </div>
-          <p className="text-xs text-slate-500">
-            Consider creating a savings goal instead of withdrawing. Goals help you save for specific purposes while keeping your money earning interest.
           </p>
         </div>
       </motion.div>

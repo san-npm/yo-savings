@@ -34,18 +34,16 @@ export default function ActivityPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  const { getClient, address } = useYoClient();
+  const { client, address } = useYoClient();
   const allAccounts = getAllAccounts();
 
   useEffect(() => {
     const fetchTransactions = async () => {
-      if (!address) return;
-      
+      if (!address || !client) return;
+
       try {
         setIsLoading(true);
         setError(null);
-        
-        const client = await getClient();
         const allTransactions: Transaction[] = [];
 
         // Fetch history from both vaults
@@ -57,15 +55,15 @@ export default function ActivityPage() {
               50 // Limit to last 50 transactions per vault
             );
 
-            const accountTransactions = history.map((tx: any) => ({
-              id: tx.transactionHash,
+            const accountTransactions = history.map((tx) => ({
+              id: tx.txHash,
               type: (tx.type === 'deposit' ? 'deposit' : 'withdraw') as 'deposit' | 'withdraw',
-              amount: Number(tx.amount) / 1e6, // Convert from 6 decimals
+              amount: Number(tx.assets.raw) / 1e6,
               account: account.displayName,
               accountId: account.id,
               date: tx.timestamp,
               status: 'completed' as const,
-              hash: tx.transactionHash,
+              hash: tx.txHash,
             }));
 
             allTransactions.push(...accountTransactions);
@@ -88,7 +86,7 @@ export default function ActivityPage() {
     };
 
     fetchTransactions();
-  }, [address, getClient]);
+  }, [address, client]);
 
   const filteredTransactions = transactions.filter(tx => {
     if (filter !== 'all' && tx.type !== filter) return false;

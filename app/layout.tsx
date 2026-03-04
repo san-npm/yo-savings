@@ -12,7 +12,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: 'Stash - Your savings, earning more',
-  description: 'Open a savings account in 30 seconds. Earn up to 12% per year.',
+  description: 'Open a savings account in 30 seconds. Earn competitive interest rates, automatically.',
   keywords: ['savings', 'interest', 'earn', 'money', 'finance'],
   authors: [{ name: 'Stash Team' }],
   manifest: '/manifest.json',

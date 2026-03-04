@@ -4,22 +4,14 @@ import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { useVaults, useUserBalance, useVaultHistory } from '@yo-protocol/react';
+import { useUserBalance, useVaultHistory } from '@yo-protocol/react';
+import { useVaultSnapshot } from '@/lib/useVaultSnapshot';
 import { useYoClient } from '@/lib/useYoClient';
 
 import { getAccountById, type AccountId } from '@/lib/accounts';
 import { EarningsChart } from '@/components/EarningsChart';
-import { formatBalance, formatPercentage, formatDateRelative } from '@/lib/format';
+import { formatBalance, formatPercentage } from '@/lib/format';
 import { CurrencyIcon } from '@/components/CurrencyIcon';
-
-// Helper function to get APY (placeholder until YO SDK provides this)
-const getVaultAPY = (symbol?: string) => {
-  const apyMap: Record<string, number> = {
-    yoUSD: 8.5,
-    yoEUR: 7.2,
-  };
-  return symbol ? apyMap[symbol] : 0;
-};
 
 interface Transaction {
   id: string;
@@ -32,41 +24,44 @@ interface Transaction {
 export default function AccountDetailPage() {
   const params = useParams();
   const accountId = params.id as AccountId;
-  const { getClient, address } = useYoClient();
+  const { client, address } = useYoClient();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [transactionsLoading, setTransactionsLoading] = useState(true);
-  
+
   const account = getAccountById(accountId);
-  const { vaults, isLoading: vaultsLoading } = useVaults();
-  const vault = vaults?.find(v => v.address.toLowerCase() === account.vaultAddress.toLowerCase());
-  const { position, isLoading: balanceLoading } = useUserBalance(account.vaultAddress as `0x${string}`, address);
-  const { yieldHistory, isLoading: historyLoading } = useVaultHistory(account.vaultAddress as `0x${string}`);
+  const { position, isLoading: balanceLoading } = useUserBalance(
+    account.vaultAddress as `0x${string}`,
+    address
+  );
+  const { yieldHistory, isLoading: historyLoading } = useVaultHistory(
+    account.vaultAddress as `0x${string}`
+  );
+  const { snapshot, isLoading: snapshotLoading } = useVaultSnapshot(
+    account.vaultAddress as `0x${string}`
+  );
 
   useEffect(() => {
     const fetchTransactions = async () => {
-      if (!address) return;
-      
+      if (!address || !client) return;
+
       try {
         setTransactionsLoading(true);
-        const client = await getClient();
-        
         const history = await client.getUserHistory(
           account.vaultAddress as `0x${string}`,
           address,
-          5 // Limit to last 5 transactions
+          5
         );
 
-        const formattedTransactions = history.map((tx: any) => ({
-          id: tx.transactionHash,
+        const formattedTransactions = history.map((tx) => ({
+          id: tx.txHash,
           type: (tx.type === 'deposit' ? 'deposit' : 'withdrawal') as 'deposit' | 'withdrawal',
-          amount: Number(tx.amount) / 1e6, // Convert from 6 decimals
+          amount: Number(tx.assets.raw) / 1e6,
           timestamp: tx.timestamp,
           status: 'completed' as const,
         }));
 
         setTransactions(formattedTransactions);
-      } catch (error) {
-        console.error('Error fetching transactions:', error);
+      } catch {
         setTransactions([]);
       } finally {
         setTransactionsLoading(false);
@@ -74,7 +69,7 @@ export default function AccountDetailPage() {
     };
 
     fetchTransactions();
-  }, [address, account.vaultAddress, getClient]);
+  }, [address, account.vaultAddress, client]);
 
   if (!account) {
     return (
@@ -84,10 +79,9 @@ export default function AccountDetailPage() {
     );
   }
 
-  // TODO: Get real APY from YO SDK when available
-  const annualRate = getVaultAPY(vault?.symbol) || 0;
-  const balance = Number(position?.assets || BigInt(0));
-  const isLoading = vaultsLoading || balanceLoading;
+  const annualRate = parseFloat(snapshot?.stats?.yield?.['7d'] ?? '0');
+  const balance = Number(position?.assets || BigInt(0)) / 1e6;
+  const isLoading = balanceLoading || snapshotLoading;
 
   return (
     <motion.div
@@ -106,7 +100,7 @@ export default function AccountDetailPage() {
           </svg>
         </Link>
         <h1 className="text-lg font-medium text-slate-800">Account Details</h1>
-        <div className="w-8" /> {/* Spacer */}
+        <div className="w-8" />
       </div>
 
       {/* Account Info Card */}
@@ -132,7 +126,6 @@ export default function AccountDetailPage() {
           </div>
         </div>
 
-        {/* Balance */}
         <div className="space-y-2 mb-6">
           <p className="text-sm text-slate-500">Current Balance</p>
           <div className="text-4xl font-semibold text-slate-800 tabular-nums">
@@ -144,7 +137,6 @@ export default function AccountDetailPage() {
           </div>
         </div>
 
-        {/* Action Buttons */}
         <div className="grid grid-cols-2 gap-3">
           <Link href={`/deposit?account=${accountId}`}>
             <motion.button
@@ -191,10 +183,9 @@ export default function AccountDetailPage() {
         className="space-y-4"
       >
         <h3 className="text-lg font-medium text-slate-800">Recent Activity</h3>
-        
+
         <div className="space-y-3">
           {transactionsLoading ? (
-            // Loading skeleton
             [...Array(3)].map((_, i) => (
               <div key={i} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 animate-pulse">
                 <div className="flex items-center space-x-3">
@@ -251,7 +242,7 @@ export default function AccountDetailPage() {
                     </p>
                   </div>
                 </div>
-                
+
                 <div className="text-right">
                   <div className={`text-sm font-semibold tabular-nums ${
                     tx.type === 'deposit' ? 'text-green-500' : 'text-slate-500'
@@ -281,17 +272,13 @@ export default function AccountDetailPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
           </div>
-          <span className="text-sm font-medium text-slate-700">Institutional-grade security</span>
+          <span className="text-sm font-medium text-slate-700">Secured by audited protocols</span>
         </div>
         <p className="text-xs text-slate-400">
-          Your funds are always yours. Withdraw anytime with no fees.{' '}
-          <a href="#" className="text-green-500 hover:text-green-400 underline">
-            View audit reports
-          </a>
+          Your funds are always yours. Withdraw anytime with no fees.
         </p>
       </motion.div>
 
-      {/* Bottom spacing */}
       <div className="pb-20" />
     </motion.div>
   );

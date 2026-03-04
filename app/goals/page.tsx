@@ -13,37 +13,41 @@ import { CurrencyIcon } from '@/components/CurrencyIcon';
 
 function GoalsPageContent() {
   const { authenticated } = usePrivy();
+  const { wallets } = useWallets();
+  const embeddedWallet = wallets.find(w => w.walletClientType === 'privy');
+  const userAddress = embeddedWallet?.address;
+
   const [goals, setGoals] = useState<SavingsGoal[]>([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingGoal, setEditingGoal] = useState<SavingsGoal | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load goals on mount
+  // Load goals scoped to user address
   useEffect(() => {
-    const loadedGoals = loadGoals();
+    const loadedGoals = loadGoals(userAddress);
     setGoals(loadedGoals);
     setIsLoading(false);
-  }, []);
+  }, [userAddress]);
 
   const refreshGoals = () => {
-    setGoals(loadGoals());
+    setGoals(loadGoals(userAddress));
   };
 
   const handleCreateGoal = (goalData: Omit<SavingsGoal, 'id' | 'createdAt' | 'updatedAt'>) => {
-    createGoal(goalData);
+    createGoal(goalData, userAddress);
     refreshGoals();
     setShowCreateForm(false);
   };
 
   const handleUpdateGoal = (id: string, updates: Partial<SavingsGoal>) => {
-    updateGoal(id, updates);
+    updateGoal(id, updates, userAddress);
     refreshGoals();
     setEditingGoal(null);
   };
 
   const handleDeleteGoal = (id: string) => {
-    deleteGoal(id);
+    deleteGoal(id, userAddress);
     refreshGoals();
     setDeleteConfirm(null);
   };
