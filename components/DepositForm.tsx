@@ -6,6 +6,7 @@ import type { SavingsAccount } from '@/lib/accounts';
 import { parseAmountInput } from '@/lib/format';
 import { Confetti } from './Confetti';
 import { CurrencyIcon } from './CurrencyIcon';
+import { useHaptics } from '@/lib/useHaptics';
 
 interface DepositFormProps {
   account: SavingsAccount;
@@ -47,6 +48,7 @@ export function DepositForm({
   const [successAmount, setSuccessAmount] = useState(0);
   const [localTxHash, setLocalTxHash] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const haptics = useHaptics();
 
   const handleAmountChange = (value: string) => {
     const cleaned = value.replace(/[^0-9.]/g, '');
@@ -59,6 +61,7 @@ export function DepositForm({
   };
 
   const handleQuickAmount = (quickAmount: number) => {
+    haptics.tap();
     setAmount(quickAmount.toString());
     setError(null);
   };
@@ -67,10 +70,12 @@ export function DepositForm({
     e.preventDefault();
     const parsedAmount = parseAmountInput(amount);
     if (parsedAmount < MIN_DEPOSIT) {
+      haptics.error();
       setError(`Minimum deposit is ${account.currencySymbol}${MIN_DEPOSIT}`);
       return;
     }
     // Show confirmation dialog
+    haptics.confirm();
     setShowConfirm(true);
   };
 
@@ -86,9 +91,11 @@ export function DepositForm({
     try {
       const result = await onDeposit(amount);
       setLocalTxHash(result.hash);
+      haptics.success();
       setShowSuccess(true);
       setAmount('');
     } catch (err: any) {
+      haptics.error();
       setError(friendlyError(err));
     } finally {
       setIsSubmitting(false);

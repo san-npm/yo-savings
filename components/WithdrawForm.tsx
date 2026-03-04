@@ -6,6 +6,7 @@ import type { SavingsAccount } from '@/lib/accounts';
 import { parseAmountInput, formatBalance } from '@/lib/format';
 import { Confetti } from './Confetti';
 import { CurrencyIcon } from './CurrencyIcon';
+import { useHaptics } from '@/lib/useHaptics';
 
 interface WithdrawFormProps {
   account: SavingsAccount;
@@ -48,6 +49,7 @@ export function WithdrawForm({
   const [localTxHash, setLocalTxHash] = useState<string | null>(null);
   const [localIsQueued, setLocalIsQueued] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const haptics = useHaptics();
 
   const handleAmountChange = (value: string) => {
     const cleaned = value.replace(/[^0-9.]/g, '');
@@ -64,6 +66,7 @@ export function WithdrawForm({
   };
 
   const handleQuickPercentage = (percentage: number) => {
+    haptics.tap();
     const quickAmount = (availableBalance * percentage / 100);
     setAmount(quickAmount.toFixed(2));
     setError(null);
@@ -73,13 +76,16 @@ export function WithdrawForm({
     e.preventDefault();
     const parsedAmount = parseAmountInput(amount);
     if (parsedAmount < MIN_WITHDRAW) {
+      haptics.error();
       setError(`Minimum withdrawal is ${account.currencySymbol}${MIN_WITHDRAW}`);
       return;
     }
     if (parsedAmount > availableBalance) {
+      haptics.error();
       setError('Amount exceeds available balance');
       return;
     }
+    haptics.confirm();
     setShowConfirm(true);
   };
 
@@ -96,9 +102,11 @@ export function WithdrawForm({
       const result = await onWithdraw(amount);
       setLocalTxHash(result.hash);
       setLocalIsQueued(!result.instant);
+      haptics.success();
       setShowSuccess(true);
       setAmount('');
     } catch (err: any) {
+      haptics.error();
       setError(friendlyError(err));
     } finally {
       setIsSubmitting(false);
