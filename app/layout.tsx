@@ -4,6 +4,7 @@ import './globals.css';
 import { Providers } from './providers';
 import { ClientOnly } from '@/components/ClientOnly';
 import { BottomNav } from '@/components/BottomNav';
+import { Bootstrap } from '@/components/Bootstrap';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -44,6 +45,7 @@ export default function RootLayout({
       <body style={{ minHeight: '100vh' }}>
         <ClientOnly>
           <Providers>
+            <Bootstrap />
             <div className="min-h-screen pb-20 lg:pb-0">
               <main className="container mx-auto px-4 py-6 max-w-md lg:max-w-2xl">
                 {children}
@@ -52,28 +54,6 @@ export default function RootLayout({
             </div>
           </Providers>
         </ClientOnly>
-        <script dangerouslySetInnerHTML={{
-          __html: `
-            // Recover from chunk load failures (stale cache or adblocker)
-            window.addEventListener('error', function(e) {
-              if (e.message && (e.message.includes('ChunkLoadError') || e.message.includes('Failed to load chunk') || e.message.includes('Loading chunk'))) {
-                if (!sessionStorage.getItem('chunk_reload')) {
-                  sessionStorage.setItem('chunk_reload', '1');
-                  window.location.reload();
-                }
-              }
-            });
-            // Register service worker
-            if ('serviceWorker' in navigator) {
-              navigator.serviceWorker.register('/sw.js')
-                .then(function(reg) {
-                  // Force update check on page load
-                  reg.update();
-                })
-                .catch(function() {});
-            }
-          `
-        }} />
       </body>
     </html>
   );
