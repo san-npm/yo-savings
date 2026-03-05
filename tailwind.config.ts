@@ -10,36 +10,42 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Dark Theme Design System
-        background: '#0E1117',
-        'background-secondary': '#161B22',
-        surface: '#1C2333',
-        'surface-elevated': '#21273A',
-        card: '#1C2333',
+        // Yo Brand Design System
+        background: '#000000',
+        'background-secondary': '#111110',
+        surface: '#2B2C2A',
+        'surface-elevated': '#3A3B38',
+        card: '#2B2C2A',
         border: 'rgba(255, 255, 255, 0.1)',
         'border-hover': 'rgba(255, 255, 255, 0.2)',
 
-        // Accent gradient endpoints
-        accent: {
-          purple: '#B6509E',
-          teal: '#2EBAC6',
+        // Brand accent
+        accent: '#D6FF34',
+
+        // Vault-specific colors
+        vault: {
+          usd: '#00FF8B',
+          eur: '#4E6FFF',
+          btc: '#FFAF4F',
+          gold: '#FFBF00',
+          sol: '#DA6AFF',
         },
 
         // Semantic colors
-        primary: '#B6509E',
-        'primary-hover': '#C76AB2',
-        secondary: '#2EBAC6',
+        primary: '#D6FF34',
+        'primary-hover': '#E0FF5C',
+        secondary: '#D6FF34',
         success: '#22C55E',
         error: '#EF4444',
         warning: '#F59E0B',
 
         // Text
         'text-primary': '#F1F5F9',
-        'text-secondary': '#94A3B8',
-        'text-muted': '#64748B',
+        'text-secondary': '#A0A0A0',
+        'text-muted': '#666666',
       },
       fontFamily: {
-        sans: ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-space-grotesk)', 'Space Grotesk', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         'balance': ['2.25rem', { lineHeight: '2.5rem', letterSpacing: '-0.025em' }],
@@ -65,6 +71,7 @@ const config: Config = {
         'scale-in': 'scaleIn 0.3s ease-out',
         'shimmer': 'shimmer 2s linear infinite',
         'glow-pulse': 'glowPulse 2s ease-in-out infinite',
+        'float': 'float 6s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -94,8 +101,12 @@ const config: Config = {
           '100%': { backgroundPosition: '200% 0' },
         },
         glowPulse: {
-          '0%, 100%': { opacity: '0.5' },
+          '0%, 100%': { opacity: '0.4' },
           '50%': { opacity: '1' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-6px)' },
         },
       },
     },

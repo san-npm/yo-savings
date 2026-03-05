@@ -49,7 +49,7 @@ export default function DepositPage() {
   if (!address) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-slate-500">Please sign in first</p>
+        <p className="text-[#666666]">Please sign in first</p>
       </div>
     );
   }
@@ -66,7 +66,7 @@ export default function DepositPage() {
           href="/"
           className="p-2 hover:bg-white/5 rounded-xl transition-colors"
         >
-          <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-[#A0A0A0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </Link>
@@ -82,7 +82,7 @@ export default function DepositPage() {
           transition={{ delay: 0.1 }}
           className="space-y-4"
         >
-          <h2 className="text-sm font-medium text-slate-500">
+          <h2 className="text-sm font-medium text-[#666666]">
             Choose Savings Account
           </h2>
 
@@ -94,18 +94,18 @@ export default function DepositPage() {
                 onClick={() => setSelectedAccountId(account.id)}
                 className={`w-full p-3 rounded-xl border transition-all ${
                   selectedAccountId === account.id
-                    ? 'bg-white/5 border-white/20 shadow-[0_0_15px_rgba(182,80,158,0.15)]'
-                    : 'bg-[#1C2333] border-white/10 hover:border-white/20'
+                    ? 'bg-white/5 border-white/20 shadow-[0_0_15px_rgba(214,255,52,0.15)]'
+                    : 'bg-[#2B2C2A] border-white/10 hover:border-white/20'
                 }`}
               >
                 <div className="flex items-center space-x-3">
                   <CurrencyIcon accountId={account.id} size="sm" />
                   <span className={`font-medium ${
-                    selectedAccountId === account.id ? 'text-white' : 'text-slate-300'
+                    selectedAccountId === account.id ? 'text-white' : 'text-[#A0A0A0]'
                   }`}>{account.displayName}</span>
                   {selectedAccountId === account.id && (
-                    <div className="ml-auto w-5 h-5 rounded-full gradient-bg flex items-center justify-center">
-                      <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="ml-auto w-5 h-5 rounded-full bg-[#D6FF34] flex items-center justify-center">
+                      <svg className="w-3 h-3 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
@@ -138,21 +138,21 @@ export default function DepositPage() {
         transition={{ delay: 0.3 }}
         className="space-y-4"
       >
-        <div className="p-4 bg-[#1C2333] border border-white/10 rounded-xl">
+        <div className="p-4 bg-[#2B2C2A] border border-white/10 rounded-xl">
           <h3 className="text-sm font-medium text-white mb-2">
             How it works
           </h3>
-          <div className="space-y-2 text-xs text-slate-500">
+          <div className="space-y-2 text-xs text-[#666666]">
             <div className="flex items-start space-x-2">
-              <span className="gradient-text mt-0.5">&bull;</span>
+              <span className="text-[#D6FF34] mt-0.5">&bull;</span>
               <span>Your money goes into a secure savings account</span>
             </div>
             <div className="flex items-start space-x-2">
-              <span className="gradient-text mt-0.5">&bull;</span>
+              <span className="text-[#D6FF34] mt-0.5">&bull;</span>
               <span>Starts earning interest immediately</span>
             </div>
             <div className="flex items-start space-x-2">
-              <span className="gradient-text mt-0.5">&bull;</span>
+              <span className="text-[#D6FF34] mt-0.5">&bull;</span>
               <span>Withdraw anytime with no penalties</span>
             </div>
           </div>
@@ -160,14 +160,14 @@ export default function DepositPage() {
 
         <div className="p-4 bg-white/5 border border-white/10 rounded-xl">
           <div className="flex items-center space-x-2 mb-2">
-            <div className="w-5 h-5 rounded-full gradient-bg flex items-center justify-center">
-              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-5 h-5 rounded-full bg-[#D6FF34] flex items-center justify-center">
+              <svg className="w-3 h-3 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
             <span className="text-sm font-medium text-white">Secured by Audited Protocols</span>
           </div>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-[#666666]">
             Your deposits are secured by independently audited smart contracts. Your funds are always yours &mdash; withdraw anytime.
           </p>
         </div>

@@ -80,7 +80,7 @@ function GoalsPageContent() {
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-[#1C2333] border border-white/10 rounded-2xl p-6 max-w-sm w-full space-y-4"
+          className="bg-[#2B2C2A] border border-white/10 rounded-2xl p-6 max-w-sm w-full space-y-4"
         >
           <div className="text-center space-y-2">
             <div className="w-12 h-12 bg-red-500/10 border border-red-500/20 rounded-full flex items-center justify-center mx-auto">
@@ -89,7 +89,7 @@ function GoalsPageContent() {
               </svg>
             </div>
             <h3 className="text-lg font-semibold text-white">Delete Goal?</h3>
-            <p className="text-slate-400">
+            <p className="text-[#A0A0A0]">
               Are you sure you want to delete &ldquo;{goalToDelete?.name}&rdquo;? This action cannot be undone.
             </p>
           </div>
@@ -97,7 +97,7 @@ function GoalsPageContent() {
           <div className="flex space-x-3">
             <button
               onClick={() => setDeleteConfirm(null)}
-              className="flex-1 py-3 px-4 bg-white/10 text-slate-300 rounded-xl font-medium hover:bg-white/15 transition-colors border border-white/10"
+              className="flex-1 py-3 px-4 bg-white/10 text-[#A0A0A0] rounded-xl font-medium hover:bg-white/15 transition-colors border border-white/10"
             >
               Cancel
             </button>
@@ -123,13 +123,13 @@ function GoalsPageContent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Savings Goals</h1>
-          <p className="text-slate-400 mt-1">Save for what matters most</p>
+          <p className="text-[#A0A0A0] mt-1">Save for what matters most</p>
         </div>
         <motion.button
           whileTap={{ scale: 0.95 }}
           onClick={() => setShowCreateForm(true)}
-          className="w-10 h-10 rounded-xl gradient-bg flex items-center justify-center text-white hover:opacity-90 transition-opacity"
-          style={{ boxShadow: '0 0 15px rgba(182, 80, 158, 0.2)' }}
+          className="w-10 h-10 rounded-xl bg-[#D6FF34] flex items-center justify-center text-black hover:opacity-90 transition-opacity"
+          style={{ boxShadow: '0 0 15px rgba(214, 255, 52, 0.2)' }}
         >
           <span className="text-lg">+</span>
         </motion.button>
@@ -139,7 +139,7 @@ function GoalsPageContent() {
       {isLoading ? (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="p-4 bg-[#1C2333] border border-white/10 rounded-2xl">
+            <div key={i} className="p-4 bg-[#2B2C2A] border border-white/10 rounded-2xl">
               <div className="flex items-center space-x-3 mb-4">
                 <div className="w-6 h-6 rounded loading-pulse" />
                 <div className="w-32 h-4 rounded loading-pulse" />
@@ -154,13 +154,13 @@ function GoalsPageContent() {
           animate={{ opacity: 1, scale: 1 }}
           className="text-center py-16 space-y-4"
         >
-          <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto gradient-bg-subtle">
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4 mx-auto bg-[#D6FF34]/10">
             <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 0 0 1.946-.806 3.42 3.42 0 0 1 4.438 0 3.42 3.42 0 0 0 1.946.806 3.42 3.42 0 0 1 3.138 3.138 3.42 3.42 0 0 0 .806 1.946 3.42 3.42 0 0 1 0 4.438 3.42 3.42 0 0 0-.806 1.946 3.42 3.42 0 0 1-3.138 3.138 3.42 3.42 0 0 0-1.946.806 3.42 3.42 0 0 1-4.438 0 3.42 3.42 0 0 0-1.946-.806 3.42 3.42 0 0 1-3.138-3.138 3.42 3.42 0 0 0-.806-1.946 3.42 3.42 0 0 1 0-4.438 3.42 3.42 0 0 0 .806-1.946 3.42 3.42 0 0 1 3.138-3.138z" />
             </svg>
           </div>
           <h3 className="text-lg font-semibold text-white">No goals yet</h3>
-          <p className="text-slate-500 max-w-sm mx-auto">
+          <p className="text-[#666666] max-w-sm mx-auto">
             Create your first savings goal to start working towards something special
           </p>
           <motion.button
@@ -191,17 +191,17 @@ function GoalsPageContent() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="p-4 bg-[#1C2333] border border-white/10 rounded-xl"
+          className="p-4 bg-[#2B2C2A] border border-white/10 rounded-xl"
         >
           <div className="flex items-center space-x-2 mb-2">
-            <div className="w-5 h-5 rounded-full flex items-center justify-center gradient-bg-subtle">
+            <div className="w-5 h-5 rounded-full flex items-center justify-center bg-[#D6FF34]/10">
               <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <span className="text-sm font-medium text-white">Tips for Success</span>
           </div>
-          <div className="space-y-1 text-xs text-slate-500">
+          <div className="space-y-1 text-xs text-[#666666]">
             <p>&bull; Set realistic target amounts you can achieve</p>
             <p>&bull; Link goals to accounts that match your timeline</p>
             <p>&bull; Your money keeps earning interest while working toward goals</p>
@@ -264,7 +264,7 @@ function EditGoalForm({
           onClick={onCancel}
           className="p-2 hover:bg-white/5 rounded-xl transition-colors"
         >
-          <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-[#A0A0A0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
@@ -276,7 +276,7 @@ function EditGoalForm({
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Goal Name */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-slate-400">
+          <label className="block text-sm font-medium text-[#A0A0A0]">
             Goal name
           </label>
           <input
@@ -291,7 +291,7 @@ function EditGoalForm({
 
         {/* Emoji Selector */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-slate-400">
+          <label className="block text-sm font-medium text-[#A0A0A0]">
             Choose an emoji
           </label>
           <div className="grid grid-cols-5 gap-2">
@@ -302,7 +302,7 @@ function EditGoalForm({
                 onClick={() => setEmoji(emojiOption)}
                 className={`p-3 rounded-xl border transition-all ${
                   emoji === emojiOption
-                    ? 'bg-white/10 border-white/30 shadow-[0_0_10px_rgba(182,80,158,0.15)]'
+                    ? 'bg-white/10 border-white/30 shadow-[0_0_10px_rgba(214,255,52,0.15)]'
                     : 'bg-white/5 border-white/10 hover:border-white/20'
                 }`}
               >
@@ -314,7 +314,7 @@ function EditGoalForm({
 
         {/* Target Amount */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-slate-400">
+          <label className="block text-sm font-medium text-[#A0A0A0]">
             Target amount
           </label>
           <div className="relative">
@@ -327,7 +327,7 @@ function EditGoalForm({
               min="0"
               className="w-full input pl-8"
             />
-            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500">
+            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#666666]">
               $
             </span>
           </div>
@@ -335,7 +335,7 @@ function EditGoalForm({
 
         {/* Current Amount */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-slate-400">
+          <label className="block text-sm font-medium text-[#A0A0A0]">
             Current progress
           </label>
           <div className="relative">
@@ -349,18 +349,18 @@ function EditGoalForm({
               max={targetAmount}
               className="w-full input pl-8"
             />
-            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500">
+            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#666666]">
               $
             </span>
           </div>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-[#666666]">
             Manually update your progress towards this goal
           </p>
         </div>
 
         {/* Linked Account */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-slate-400">
+          <label className="block text-sm font-medium text-[#A0A0A0]">
             Link to savings account
           </label>
           <div className="space-y-2">
@@ -371,14 +371,14 @@ function EditGoalForm({
                 onClick={() => setLinkedAccountId(account.id)}
                 className={`w-full p-3 rounded-xl border transition-all ${
                   linkedAccountId === account.id
-                    ? 'bg-white/5 border-white/20 shadow-[0_0_15px_rgba(182,80,158,0.15)]'
-                    : 'bg-[#1C2333] border-white/10 hover:border-white/20'
+                    ? 'bg-white/5 border-white/20 shadow-[0_0_15px_rgba(214,255,52,0.15)]'
+                    : 'bg-[#2B2C2A] border-white/10 hover:border-white/20'
                 }`}
               >
                 <div className="flex items-center space-x-3">
                   <CurrencyIcon accountId={account.id} size="sm" />
                   <span className={`font-medium ${
-                    linkedAccountId === account.id ? 'text-white' : 'text-slate-300'
+                    linkedAccountId === account.id ? 'text-white' : 'text-[#A0A0A0]'
                   }`}>{account.displayName}</span>
                 </div>
               </button>
@@ -393,10 +393,10 @@ function EditGoalForm({
           whileTap={{ scale: 0.95 }}
           className={`w-full h-12 rounded-xl font-medium transition-all ${
             name.trim() && targetAmount && parseFloat(targetAmount) > 0
-              ? 'text-white gradient-bg hover:opacity-90 shadow-lg'
-              : 'bg-white/5 text-slate-500 cursor-not-allowed border border-white/5'
+              ? 'text-black bg-[#D6FF34] hover:opacity-90 shadow-lg'
+              : 'bg-white/5 text-[#666666] cursor-not-allowed border border-white/5'
           }`}
-          style={name.trim() && targetAmount && parseFloat(targetAmount) > 0 ? { boxShadow: '0 0 20px rgba(182, 80, 158, 0.2)' } : {}}
+          style={name.trim() && targetAmount && parseFloat(targetAmount) > 0 ? { boxShadow: '0 0 20px rgba(214, 255, 52, 0.2)' } : {}}
         >
           Save Changes
         </motion.button>
@@ -448,7 +448,7 @@ function CreateGoalForm({
           onClick={onCancel}
           className="p-2 hover:bg-white/5 rounded-xl transition-colors"
         >
-          <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-[#A0A0A0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
@@ -460,7 +460,7 @@ function CreateGoalForm({
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Goal Name */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-slate-400">
+          <label className="block text-sm font-medium text-[#A0A0A0]">
             What are you saving for?
           </label>
           <input
@@ -475,7 +475,7 @@ function CreateGoalForm({
 
         {/* Emoji Selector */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-slate-400">
+          <label className="block text-sm font-medium text-[#A0A0A0]">
             Choose an emoji
           </label>
           <div className="grid grid-cols-5 gap-2">
@@ -486,7 +486,7 @@ function CreateGoalForm({
                 onClick={() => setEmoji(emojiOption)}
                 className={`p-3 rounded-xl border transition-all ${
                   emoji === emojiOption
-                    ? 'bg-white/10 border-white/30 shadow-[0_0_10px_rgba(182,80,158,0.15)]'
+                    ? 'bg-white/10 border-white/30 shadow-[0_0_10px_rgba(214,255,52,0.15)]'
                     : 'bg-white/5 border-white/10 hover:border-white/20'
                 }`}
               >
@@ -498,7 +498,7 @@ function CreateGoalForm({
 
         {/* Target Amount */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-slate-400">
+          <label className="block text-sm font-medium text-[#A0A0A0]">
             Target amount
           </label>
           <div className="relative">
@@ -511,7 +511,7 @@ function CreateGoalForm({
               min="0"
               className="w-full input pl-8"
             />
-            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500">
+            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#666666]">
               $
             </span>
           </div>
@@ -519,7 +519,7 @@ function CreateGoalForm({
 
         {/* Linked Account */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-slate-400">
+          <label className="block text-sm font-medium text-[#A0A0A0]">
             Link to savings account
           </label>
           <div className="space-y-2">
@@ -530,14 +530,14 @@ function CreateGoalForm({
                 onClick={() => setLinkedAccountId(account.id)}
                 className={`w-full p-3 rounded-xl border transition-all ${
                   linkedAccountId === account.id
-                    ? 'bg-white/5 border-white/20 shadow-[0_0_15px_rgba(182,80,158,0.15)]'
-                    : 'bg-[#1C2333] border-white/10 hover:border-white/20'
+                    ? 'bg-white/5 border-white/20 shadow-[0_0_15px_rgba(214,255,52,0.15)]'
+                    : 'bg-[#2B2C2A] border-white/10 hover:border-white/20'
                 }`}
               >
                 <div className="flex items-center space-x-3">
                   <CurrencyIcon accountId={account.id} size="sm" />
                   <span className={`font-medium ${
-                    linkedAccountId === account.id ? 'text-white' : 'text-slate-300'
+                    linkedAccountId === account.id ? 'text-white' : 'text-[#A0A0A0]'
                   }`}>{account.displayName}</span>
                 </div>
               </button>
@@ -552,26 +552,26 @@ function CreateGoalForm({
           whileTap={{ scale: 0.95 }}
           className={`w-full h-12 rounded-xl font-medium transition-all ${
             name.trim() && targetAmount && parseFloat(targetAmount) > 0
-              ? 'text-white gradient-bg hover:opacity-90 shadow-lg'
-              : 'bg-white/5 text-slate-500 cursor-not-allowed border border-white/5'
+              ? 'text-black bg-[#D6FF34] hover:opacity-90 shadow-lg'
+              : 'bg-white/5 text-[#666666] cursor-not-allowed border border-white/5'
           }`}
-          style={name.trim() && targetAmount && parseFloat(targetAmount) > 0 ? { boxShadow: '0 0 20px rgba(182, 80, 158, 0.2)' } : {}}
+          style={name.trim() && targetAmount && parseFloat(targetAmount) > 0 ? { boxShadow: '0 0 20px rgba(214, 255, 52, 0.2)' } : {}}
         >
           Create Goal
         </motion.button>
       </form>
 
       {/* Info */}
-      <div className="p-4 bg-[#1C2333] border border-white/10 rounded-xl">
+      <div className="p-4 bg-[#2B2C2A] border border-white/10 rounded-xl">
         <div className="flex items-center space-x-2 mb-2">
-          <div className="w-5 h-5 rounded-full flex items-center justify-center gradient-bg-subtle">
+          <div className="w-5 h-5 rounded-full flex items-center justify-center bg-[#D6FF34]/10">
             <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
           <span className="text-sm font-medium text-white">How it works</span>
         </div>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-[#666666]">
           Goals are linked to your savings accounts. Your money continues earning interest while you track progress toward your target. You can contribute to goals through regular deposits.
         </p>
       </div>

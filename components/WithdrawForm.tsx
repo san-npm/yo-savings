@@ -132,16 +132,22 @@ export function WithdrawForm({
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-          className="w-16 h-16 rounded-full flex items-center justify-center gradient-bg"
+          className="w-16 h-16 rounded-full flex items-center justify-center bg-[#D6FF34] relative"
         >
-          <span className="text-2xl text-white">&#10003;</span>
+          <motion.div
+            className="absolute inset-0 rounded-full bg-[#D6FF34]"
+            initial={{ scale: 1, opacity: 0.5 }}
+            animate={{ scale: 2, opacity: 0 }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
+          />
+          <span className="text-2xl text-black relative z-10">&#10003;</span>
         </motion.div>
 
         <div className="text-center space-y-2">
           <h2 className="text-xl font-semibold text-white mb-2">
             {queuedStatus ? 'Queued for Processing' : 'Done!'}
           </h2>
-          <p className="text-slate-400">
+          <p className="text-[#A0A0A0]">
             {account.currencySymbol}{successAmount.toFixed(2)} {queuedStatus ? 'queued for withdrawal' : 'withdrawn to your account'}
           </p>
           {queuedStatus && (
@@ -154,7 +160,7 @@ export function WithdrawForm({
               href={`https://basescan.org/tx/${localTxHash}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs gradient-text hover:opacity-80 underline"
+              className="text-xs text-[#D6FF34] hover:opacity-80 underline"
             >
               View transaction
             </a>
@@ -164,7 +170,7 @@ export function WithdrawForm({
         <motion.button
           whileTap={{ scale: 0.95 }}
           onClick={() => { setShowSuccess(false); onReset?.(); }}
-          className="px-6 py-3 text-white font-medium rounded-xl gradient-bg hover:opacity-90 transition-opacity"
+          className="px-6 py-3 text-black font-medium rounded-xl bg-[#D6FF34] hover:opacity-90 transition-opacity"
         >
           Done
         </motion.button>
@@ -189,43 +195,43 @@ export function WithdrawForm({
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 100, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md bg-[#1C2333] border border-white/10 rounded-2xl p-6 space-y-5 shadow-xl"
+              className="w-full max-w-md bg-[#2B2C2A] border border-white/10 rounded-2xl p-6 space-y-5 shadow-xl"
             >
               <h3 className="text-lg font-semibold text-white text-center">Confirm Withdrawal</h3>
 
               <div className="p-4 bg-white/5 rounded-xl space-y-3 border border-white/5">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-400">Amount</span>
+                  <span className="text-sm text-[#A0A0A0]">Amount</span>
                   <span className="text-lg font-semibold text-white">
                     {account.currencySymbol}{parsedAmount.toFixed(2)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-400">From</span>
-                  <span className="text-sm font-medium text-slate-300">{account.displayName}</span>
+                  <span className="text-sm text-[#A0A0A0]">From</span>
+                  <span className="text-sm font-medium text-[#A0A0A0]">{account.displayName}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-400">Remaining</span>
-                  <span className="text-sm text-slate-300">
+                  <span className="text-sm text-[#A0A0A0]">Remaining</span>
+                  <span className="text-sm text-[#A0A0A0]">
                     {account.currencySymbol}{(availableBalance - parsedAmount).toFixed(2)}
                   </span>
                 </div>
               </div>
 
-              <p className="text-xs text-slate-500 text-center">
+              <p className="text-xs text-[#666666] text-center">
                 Withdrawn funds will stop earning interest immediately.
               </p>
 
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowConfirm(false)}
-                  className="flex-1 h-12 rounded-xl font-medium bg-white/10 text-slate-300 hover:bg-white/15 transition-colors border border-white/10"
+                  className="flex-1 h-12 rounded-xl font-medium bg-white/10 text-[#A0A0A0] hover:bg-white/15 transition-colors border border-white/10"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleConfirmWithdraw}
-                  className="flex-1 h-12 rounded-xl font-medium text-white gradient-bg hover:opacity-90 transition-opacity"
+                  className="flex-1 h-12 rounded-xl font-medium text-black bg-[#D6FF34] hover:opacity-90 transition-opacity"
                 >
                   Confirm
                 </button>
@@ -242,12 +248,12 @@ export function WithdrawForm({
         className="space-y-8"
       >
         {/* Account Header */}
-        <div className="flex items-center justify-between p-4 bg-[#1C2333] border border-white/10 rounded-2xl">
+        <div className="flex items-center justify-between p-4 bg-[#2B2C2A] border border-white/10 rounded-2xl">
           <div className="flex items-center space-x-3">
             <CurrencyIcon accountId={account.id} />
             <div>
               <h2 className="font-medium text-white">{account.displayName}</h2>
-              <p className="text-sm text-slate-400">Withdraw to your account</p>
+              <p className="text-sm text-[#A0A0A0]">Withdraw to your account</p>
             </div>
           </div>
         </div>
@@ -255,7 +261,7 @@ export function WithdrawForm({
         {/* Available Balance */}
         <div className="p-4 bg-white/5 rounded-xl border border-white/10">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-slate-400">Available balance</span>
+            <span className="text-sm text-[#A0A0A0]">Available balance</span>
             <div className="text-right">
               <div className="font-semibold text-white tabular-nums">
                 {formatBalance(availableBalance, account.id)}
@@ -267,13 +273,13 @@ export function WithdrawForm({
         {/* Amount Input */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <label className="block text-sm font-medium text-slate-400">Amount to withdraw</label>
+            <label className="block text-sm font-medium text-[#A0A0A0]">Amount to withdraw</label>
             <motion.button
               type="button"
               whileTap={{ scale: 0.95 }}
               onClick={handleMaxAmount}
               disabled={busy}
-              className="text-sm gradient-text hover:opacity-80 transition-opacity disabled:opacity-50"
+              className="text-sm text-[#D6FF34] hover:opacity-80 transition-opacity disabled:opacity-50"
             >
               Max
             </motion.button>
@@ -287,12 +293,12 @@ export function WithdrawForm({
               onChange={(e) => handleAmountChange(e.target.value)}
               placeholder="0.00"
               disabled={busy}
-              className={`w-full text-4xl font-semibold text-center bg-transparent placeholder-slate-600 border-none outline-none tabular-nums ${
+              className={`w-full text-4xl font-semibold text-center bg-transparent placeholder-[#666666] border-none outline-none tabular-nums ${
                 isOverLimit ? 'text-red-400' : 'text-white'
               } disabled:opacity-50`}
               autoFocus
             />
-            <div className="absolute left-1/2 transform -translate-x-1/2 -top-8 text-2xl text-slate-500">
+            <div className="absolute left-1/2 transform -translate-x-1/2 -top-8 text-2xl text-[#666666]">
               {account.currencySymbol}
             </div>
 
@@ -307,7 +313,7 @@ export function WithdrawForm({
             )}
           </div>
 
-          {/* Quick Percentages — glass pills */}
+          {/* Quick Percentages */}
           <div className="grid grid-cols-4 gap-2">
             {[25, 50, 75, 100].map((percentage) => (
               <motion.button
@@ -316,7 +322,7 @@ export function WithdrawForm({
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleQuickPercentage(percentage)}
                 disabled={busy}
-                className="py-2 px-3 text-sm font-medium text-slate-300 bg-white/8 border border-white/10 rounded-xl hover:bg-white/12 hover:border-white/20 transition-all disabled:opacity-50"
+                className="py-2 px-3 text-sm font-medium text-[#A0A0A0] bg-white/8 border border-white/10 rounded-xl hover:bg-white/12 hover:border-white/20 transition-all disabled:opacity-50"
               >
                 {percentage}%
               </motion.button>
@@ -333,14 +339,14 @@ export function WithdrawForm({
 
         {/* Step indicator */}
         {currentStepLabel && !error && (
-          <div className="p-3 bg-accent-purple/10 border border-accent-purple/20 rounded-xl">
+          <div className="p-3 bg-[#D6FF34]/10 border border-[#D6FF34]/20 rounded-xl">
             <div className="flex items-center space-x-2">
               <motion.div
-                className="w-4 h-4 border-2 border-accent-purple/30 border-t-accent-purple rounded-full"
+                className="w-4 h-4 border-2 border-[#D6FF34]/30 border-t-[#D6FF34] rounded-full"
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
               />
-              <p className="text-sm text-accent-purple">{currentStepLabel}</p>
+              <p className="text-sm text-[#D6FF34]">{currentStepLabel}</p>
             </div>
           </div>
         )}
@@ -352,15 +358,15 @@ export function WithdrawForm({
           whileTap={{ scale: isValid && !busy ? 0.95 : 1 }}
           className={`w-full h-12 rounded-xl font-medium transition-all ${
             isValid && !busy
-              ? 'text-white gradient-bg hover:opacity-90 shadow-lg'
-              : 'bg-white/5 text-slate-500 cursor-not-allowed border border-white/5'
+              ? 'text-black bg-[#D6FF34] hover:opacity-90 shadow-lg'
+              : 'bg-white/5 text-[#666666] cursor-not-allowed border border-white/5'
           }`}
-          style={isValid && !busy ? { boxShadow: '0 0 20px rgba(46, 186, 198, 0.2)' } : {}}
+          style={isValid && !busy ? { boxShadow: '0 0 20px rgba(214,255,52,0.2)' } : {}}
         >
           {busy ? (
             <div className="flex items-center justify-center space-x-2">
               <motion.div
-                className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
+                className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full"
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
               />
@@ -372,7 +378,7 @@ export function WithdrawForm({
         </motion.button>
 
         {/* Info */}
-        <div className="text-center text-xs text-slate-500 space-y-1">
+        <div className="text-center text-xs text-[#666666] space-y-1">
           <p>Funds will be available in your account</p>
           <p>No fees &bull; Fast processing</p>
         </div>

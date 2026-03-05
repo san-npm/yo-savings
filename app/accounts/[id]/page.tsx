@@ -74,12 +74,15 @@ export default function AccountDetailPage() {
   if (!account) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-slate-500">Account not found</p>
+        <p className="text-[#666666]">Account not found</p>
       </div>
     );
   }
 
   const annualRate = parseFloat(snapshot?.stats?.yield?.['7d'] ?? '0');
+  const yield1d = parseFloat(snapshot?.stats?.yield?.['1d'] ?? '0');
+  const yield7d = parseFloat(snapshot?.stats?.yield?.['7d'] ?? '0');
+  const yield30d = parseFloat(snapshot?.stats?.yield?.['30d'] ?? '0');
   const balance = Number(position?.assets || BigInt(0)) / 1e6;
   const isLoading = balanceLoading || snapshotLoading;
 
@@ -92,7 +95,7 @@ export default function AccountDetailPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <Link href="/" className="p-2 hover:bg-white/5 rounded-xl transition-colors">
-          <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-[#A0A0A0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </Link>
@@ -100,31 +103,35 @@ export default function AccountDetailPage() {
         <div className="w-8" />
       </div>
 
-      {/* Account Info Card — gradient header */}
+      {/* Account Info Card */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
         className="overflow-hidden rounded-2xl"
       >
-        <div className="p-6 gradient-bg relative">
-          <div className="absolute inset-0 bg-white/5" />
-          <div className="relative z-10 flex items-center space-x-4 mb-6">
+        <div className="p-6 bg-[#2B2C2A] relative">
+          {/* Vault-colored top accent line */}
+          <div
+            className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl"
+            style={{ backgroundColor: account.id === 'dollar' ? '#00FF8B' : '#4E6FFF' }}
+          />
+          <div className="flex items-center space-x-4 mb-6">
             <CurrencyIcon accountId={account.id} size="lg" />
             <div>
               <h2 className="text-xl font-semibold text-white">{account.displayName}</h2>
               <div className="flex items-center space-x-2">
-                <span className="text-sm text-white/80 font-medium">
+                <span className="text-sm text-[#D6FF34] font-medium">
                   {formatPercentage(annualRate)} annual rate
                 </span>
                 <div className="w-1 h-1 bg-white/40 rounded-full" />
-                <span className="text-sm text-white/60">Earning daily</span>
+                <span className="text-sm text-[#666666]">Earning daily</span>
               </div>
             </div>
           </div>
 
-          <div className="relative z-10 space-y-2 mb-6">
-            <p className="text-sm text-white/60">Current Balance</p>
+          <div className="space-y-2 mb-6">
+            <p className="text-sm text-[#666666]">Current Balance</p>
             <div className="text-4xl font-semibold text-white tabular-nums">
               {isLoading ? (
                 <div className="w-32 h-10 bg-white/10 rounded loading-pulse" />
@@ -135,7 +142,7 @@ export default function AccountDetailPage() {
           </div>
         </div>
 
-        <div className="p-4 bg-[#1C2333] border-x border-b border-white/10 rounded-b-2xl">
+        <div className="p-4 bg-[#2B2C2A] border-x border-b border-white/10 rounded-b-2xl">
           <div className="grid grid-cols-2 gap-3">
             <Link href={`/deposit?account=${accountId}`}>
               <motion.button
@@ -157,12 +164,35 @@ export default function AccountDetailPage() {
         </div>
       </motion.div>
 
+      {/* Yield Cards (1d/7d/30d) */}
+      {!snapshotLoading && (yield1d > 0 || yield7d > 0 || yield30d > 0) && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="grid grid-cols-3 gap-3"
+        >
+          <div className="p-3 bg-[#2B2C2A] border border-white/10 rounded-xl text-center">
+            <p className="text-xs text-[#666666] mb-1">1 Day</p>
+            <p className="text-lg font-semibold text-[#D6FF34] tabular-nums">{formatPercentage(yield1d)}</p>
+          </div>
+          <div className="p-3 bg-[#2B2C2A] border border-white/10 rounded-xl text-center">
+            <p className="text-xs text-[#666666] mb-1">7 Days</p>
+            <p className="text-lg font-semibold text-[#D6FF34] tabular-nums">{formatPercentage(yield7d)}</p>
+          </div>
+          <div className="p-3 bg-[#2B2C2A] border border-white/10 rounded-xl text-center">
+            <p className="text-xs text-[#666666] mb-1">30 Days</p>
+            <p className="text-lg font-semibold text-[#D6FF34] tabular-nums">{formatPercentage(yield30d)}</p>
+          </div>
+        </motion.div>
+      )}
+
       {/* Earnings Chart */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="p-6 bg-[#1C2333] border border-white/10 rounded-2xl"
+        className="p-6 bg-[#2B2C2A] border border-white/10 rounded-2xl"
       >
         <EarningsChart
           data={(yieldHistory || []).map((point: { timestamp: number; value: number }, i: number) => ({
@@ -187,7 +217,7 @@ export default function AccountDetailPage() {
         <div className="space-y-3">
           {transactionsLoading ? (
             [...Array(3)].map((_, i) => (
-              <div key={i} className="flex items-center justify-between p-4 bg-[#1C2333] border border-white/10 rounded-xl">
+              <div key={i} className="flex items-center justify-between p-4 bg-[#2B2C2A] border border-white/10 rounded-xl">
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 rounded-full loading-pulse" />
                   <div className="space-y-1">
@@ -199,14 +229,14 @@ export default function AccountDetailPage() {
               </div>
             ))
           ) : transactions.length === 0 ? (
-            <div className="p-8 text-center bg-[#1C2333] border border-white/10 rounded-2xl">
+            <div className="p-8 text-center bg-[#2B2C2A] border border-white/10 rounded-2xl">
               <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mb-2 mx-auto">
-                <svg className="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 text-[#666666]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <p className="text-sm text-slate-400">No transactions yet</p>
-              <p className="text-xs text-slate-500">Your activity will appear here</p>
+              <p className="text-sm text-[#A0A0A0]">No transactions yet</p>
+              <p className="text-xs text-[#666666]">Your activity will appear here</p>
             </div>
           ) : (
             transactions.map((tx, index) => (
@@ -215,13 +245,13 @@ export default function AccountDetailPage() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.4 + index * 0.1 }}
-                className="flex items-center justify-between p-4 bg-[#1C2333] border border-white/10 rounded-xl"
+                className="flex items-center justify-between p-4 bg-[#2B2C2A] border border-white/10 rounded-xl"
               >
                 <div className="flex items-center space-x-3">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                     tx.type === 'deposit'
                       ? 'bg-green-500/15 text-green-400'
-                      : 'bg-white/5 text-slate-400'
+                      : 'bg-white/5 text-[#A0A0A0]'
                   }`}>
                     {tx.type === 'deposit' ? (
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -235,7 +265,7 @@ export default function AccountDetailPage() {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-white capitalize">{tx.type}</p>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-[#666666]">
                       {new Date(tx.timestamp * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     </p>
                   </div>
@@ -243,11 +273,11 @@ export default function AccountDetailPage() {
 
                 <div className="text-right">
                   <div className={`text-sm font-semibold tabular-nums ${
-                    tx.type === 'deposit' ? 'text-green-400' : 'text-slate-300'
+                    tx.type === 'deposit' ? 'text-green-400' : 'text-[#A0A0A0]'
                   }`}>
                     {tx.type === 'deposit' ? '+' : '-'}{formatBalance(tx.amount, accountId)}
                   </div>
-                  <div className="text-xs text-slate-500 capitalize">{tx.status}</div>
+                  <div className="text-xs text-[#666666] capitalize">{tx.status}</div>
                 </div>
               </motion.div>
             ))
@@ -263,14 +293,14 @@ export default function AccountDetailPage() {
         className="p-4 bg-white/5 rounded-xl border border-white/10"
       >
         <div className="flex items-center space-x-2 mb-2">
-          <div className="w-5 h-5 rounded-full flex items-center justify-center gradient-bg">
-            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-5 h-5 rounded-full flex items-center justify-center bg-[#D6FF34]">
+            <svg className="w-3 h-3 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
           </div>
           <span className="text-sm font-medium text-white">Secured by audited protocols</span>
         </div>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-[#666666]">
           Your funds are always yours. Withdraw anytime with no fees.
         </p>
       </motion.div>

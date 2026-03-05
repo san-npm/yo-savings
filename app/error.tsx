@@ -29,19 +29,19 @@ export default function Error({
           </svg>
         </div>
         <h2 className="text-lg font-semibold text-white">Something went wrong</h2>
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-[#A0A0A0]">
           This can happen if your browser blocked a resource. Try disabling your adblocker for this site.
         </p>
         <div className="flex flex-col gap-2">
           <button
             onClick={() => window.location.reload()}
-            className="w-full h-11 text-white font-medium rounded-xl gradient-bg hover:opacity-90 transition-opacity"
+            className="w-full h-11 text-black font-medium rounded-xl bg-[#D6FF34] hover:opacity-90 transition-opacity"
           >
             Reload page
           </button>
           <button
             onClick={reset}
-            className="w-full h-11 bg-white/10 text-slate-300 font-medium rounded-xl hover:bg-white/15 transition-colors border border-white/10"
+            className="w-full h-11 bg-white/10 text-[#A0A0A0] font-medium rounded-xl hover:bg-white/15 transition-colors border border-white/10"
           >
             Try again
           </button>

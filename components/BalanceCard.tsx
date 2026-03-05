@@ -23,14 +23,10 @@ export function BalanceCard({
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-3xl px-6 py-8"
-        style={{ background: 'linear-gradient(135deg, #B6509E, #2EBAC6)' }}
+        className="relative overflow-hidden rounded-3xl px-6 py-8 bg-[#2B2C2A]"
       >
-        {/* Shimmer overlay */}
-        <div className="absolute inset-0 animate-shimmer" style={{
-          background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)',
-          backgroundSize: '200% 100%',
-        }} />
+        {/* Decorative top glow line */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D6FF34]/40 to-transparent" />
         <BalanceSkeleton />
         <div className="mt-4">
           <BalanceSkeleton />
@@ -43,27 +39,13 @@ export function BalanceCard({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="relative overflow-hidden rounded-3xl px-6 py-8 space-y-6"
-      style={{ background: 'linear-gradient(135deg, #B6509E, #2EBAC6)' }}
+      className="relative overflow-hidden rounded-3xl px-6 py-8 space-y-6 bg-[#2B2C2A]"
     >
-      {/* Glass overlay for depth */}
-      <div className="absolute inset-0 bg-white/5" />
-
-      {/* Animated shimmer effect */}
+      {/* Decorative top glow line — breathing animation */}
       <motion.div
-        className="absolute inset-0 opacity-30"
-        animate={{
-          background: [
-            'linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%)',
-            'linear-gradient(135deg, transparent 100%, rgba(255,255,255,0.1) 150%, transparent 200%)',
-          ],
-        }}
-        transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
-        style={{
-          background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent)',
-          backgroundSize: '200% 100%',
-          animation: 'shimmer 3s linear infinite',
-        }}
+        className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D6FF34]/40 to-transparent"
+        animate={{ opacity: [0.4, 1, 0.4] }}
+        transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
       />
 
       {/* Content */}
@@ -92,19 +74,19 @@ export function BalanceCard({
             {(value) => formatCurrency(value, 'USD')}
           </CountUp>
         </div>
-        <p className="text-white/70 text-sm mt-1">Total savings</p>
+        <p className="text-[#A0A0A0] text-sm mt-1">Total savings</p>
       </div>
 
-      {/* Monthly Earnings Pill with glow */}
+      {/* Monthly Earnings Pill */}
       {monthlyEarnings > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="relative z-10 inline-flex items-center space-x-2 px-3 py-2 bg-white/15 backdrop-blur-sm rounded-full border border-white/20"
+          className="relative z-10 inline-flex items-center space-x-2 px-3 py-2 bg-[#D6FF34]/10 backdrop-blur-sm rounded-full border border-[#D6FF34]/20"
         >
-          <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
-          <span className="text-sm text-white font-medium">
+          <div className="w-1.5 h-1.5 bg-[#D6FF34] rounded-full animate-pulse" />
+          <span className="text-sm text-[#D6FF34] font-medium">
             <CountUp
               end={monthlyEarnings}
               duration={1000}

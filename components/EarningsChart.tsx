@@ -39,9 +39,9 @@ function CustomTooltip({ active, payload, label, accountId }: any) {
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="bg-[#21273A] border border-white/10 rounded-xl p-3 shadow-lg"
+      className="bg-[#2B2C2A] border border-white/10 rounded-xl p-3 shadow-lg"
     >
-      <p className="text-xs text-slate-400 mb-1">
+      <p className="text-xs text-[#A0A0A0] mb-1">
         {new Date(label).toLocaleDateString('en-US', {
           month: 'short',
           day: 'numeric'
@@ -67,16 +67,16 @@ export function EarningsChart({ data, accountId, isLoading = false }: EarningsCh
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="h-48 flex items-center justify-center text-slate-400 bg-[#1C2333] border border-white/10 rounded-xl"
+        className="h-48 flex items-center justify-center text-[#A0A0A0] bg-[#2B2C2A] border border-white/10 rounded-xl"
       >
         <div className="text-center">
           <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mb-2 mx-auto">
-            <svg className="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-[#666666]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
           </div>
-          <p className="text-sm text-slate-300">No earnings data yet</p>
-          <p className="text-xs text-slate-500">Start saving to see your progress</p>
+          <p className="text-sm text-[#A0A0A0]">No earnings data yet</p>
+          <p className="text-xs text-[#666666]">Start saving to see your progress</p>
         </div>
       </motion.div>
     );
@@ -93,8 +93,8 @@ export function EarningsChart({ data, accountId, isLoading = false }: EarningsCh
         <h3 className="text-lg font-semibold text-white">
           Earnings (Last 30 days)
         </h3>
-        <div className="text-xs text-slate-400 flex items-center space-x-2">
-          <div className="w-2 h-2 rounded-full gradient-bg" />
+        <div className="text-xs text-[#A0A0A0] flex items-center space-x-2">
+          <div className="w-2 h-2 rounded-full bg-[#D6FF34]" />
           <span>Balance</span>
         </div>
       </div>
@@ -107,13 +107,8 @@ export function EarningsChart({ data, accountId, isLoading = false }: EarningsCh
           >
             <defs>
               <linearGradient id={`colorGradient-${accountId}`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#B6509E" stopOpacity={0.3} />
-                <stop offset="50%" stopColor="#2EBAC6" stopOpacity={0.1} />
-                <stop offset="95%" stopColor="#2EBAC6" stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id={`strokeGradient-${accountId}`} x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#B6509E" />
-                <stop offset="100%" stopColor="#2EBAC6" />
+                <stop offset="5%" stopColor="#D6FF34" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#D6FF34" stopOpacity={0} />
               </linearGradient>
             </defs>
 
@@ -121,14 +116,14 @@ export function EarningsChart({ data, accountId, isLoading = false }: EarningsCh
               dataKey="date"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: '#64748B', fontSize: 12 }}
+              tick={{ fill: '#666666', fontSize: 12 }}
               tickFormatter={(value) => new Date(value).getDate().toString()}
             />
 
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fill: '#64748B', fontSize: 12 }}
+              tick={{ fill: '#666666', fontSize: 12 }}
               tickFormatter={(value) => {
                 const currency = getCurrencyFromAccountId(accountId);
                 return formatCurrency(value, currency as any, { compact: true, maximumFractionDigits: 0 });
@@ -137,23 +132,24 @@ export function EarningsChart({ data, accountId, isLoading = false }: EarningsCh
 
             <Tooltip
               content={<CustomTooltip accountId={accountId} />}
-              cursor={{ stroke: '#B6509E', strokeWidth: 1, strokeDasharray: '5 5' }}
+              cursor={{ stroke: '#D6FF34', strokeWidth: 1, strokeDasharray: '5 5' }}
             />
 
             <Area
               type="monotone"
               dataKey="balance"
-              stroke={`url(#strokeGradient-${accountId})`}
+              stroke="#D6FF34"
               strokeWidth={2}
               fill={`url(#colorGradient-${accountId})`}
-              dot={{ fill: '#B6509E', strokeWidth: 0, r: 3 }}
+              dot={{ fill: '#D6FF34', strokeWidth: 0, r: 3 }}
               activeDot={{
                 r: 6,
-                fill: '#B6509E',
+                fill: '#D6FF34',
                 strokeWidth: 2,
-                stroke: 'rgba(182, 80, 158, 0.3)',
-                style: { filter: 'drop-shadow(0 0 6px rgba(182, 80, 158, 0.5))' }
+                stroke: 'rgba(214, 255, 52, 0.3)',
+                style: { filter: 'drop-shadow(0 0 6px rgba(214,255,52,0.5))' }
               }}
+              animationDuration={800}
             />
           </AreaChart>
         </ResponsiveContainer>

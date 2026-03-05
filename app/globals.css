@@ -1,17 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --font-inter: 'Inter', system-ui, -apple-system, sans-serif;
-  --color-bg: #0E1117;
-  --color-bg-secondary: #161B22;
-  --color-surface: #1C2333;
-  --color-surface-elevated: #21273A;
+  --font-space-grotesk: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  --color-bg: #000000;
+  --color-bg-secondary: #111110;
+  --color-surface: #2B2C2A;
+  --color-surface-elevated: #3A3B38;
   --color-border: rgba(255, 255, 255, 0.1);
-  --color-accent-purple: #B6509E;
-  --color-accent-teal: #2EBAC6;
+  --color-accent: #D6FF34;
   --color-text-primary: #F1F5F9;
-  --color-text-secondary: #94A3B8;
-  --color-text-muted: #64748B;
+  --color-text-secondary: #A0A0A0;
+  --color-text-muted: #666666;
 }
 
 * {
@@ -19,7 +18,7 @@
 }
 
 body {
-  font-family: var(--font-inter);
+  font-family: var(--font-space-grotesk);
   font-feature-settings: "rlig" 1, "calt" 1;
   background-color: var(--color-bg);
   color: var(--color-text-primary);
@@ -47,7 +46,7 @@ input[type="number"] {
 /* === GLASS MORPHISM === */
 .glass {
   backdrop-filter: blur(20px);
-  background-color: rgba(14, 17, 23, 0.8);
+  background-color: rgba(0, 0, 0, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -64,44 +63,41 @@ input[type="number"] {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* === GRADIENT UTILITIES === */
+/* === ACCENT UTILITIES === */
 .gradient-text {
-  background: linear-gradient(135deg, #B6509E, #2EBAC6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #D6FF34;
 }
 
 .gradient-border {
   position: relative;
-  border: 1px solid transparent;
-  background-clip: padding-box;
-}
-
-.gradient-border::before {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  background: linear-gradient(135deg, #B6509E, #2EBAC6);
-  z-index: -1;
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask-composite: xor;
-  -webkit-mask-composite: xor;
-  padding: 1px;
+  border: 1px solid #D6FF34;
 }
 
 .gradient-bg {
-  background: linear-gradient(135deg, #B6509E, #2EBAC6);
+  background: #D6FF34;
 }
 
 .gradient-bg-subtle {
-  background: linear-gradient(135deg, rgba(182, 80, 158, 0.15), rgba(46, 186, 198, 0.15));
+  background: rgba(214, 255, 52, 0.1);
+}
+
+/* === NEON UTILITIES === */
+.neon-glow {
+  box-shadow: 0 0 20px rgba(214, 255, 52, 0.3), 0 0 40px rgba(214, 255, 52, 0.1);
+}
+
+.neon-text {
+  color: #D6FF34;
+  text-shadow: 0 0 10px rgba(214, 255, 52, 0.5);
+}
+
+.decorative-glow {
+  background: radial-gradient(circle, rgba(214, 255, 52, 0.06) 0%, transparent 70%);
 }
 
 /* === CARD STYLING === */
 .card {
-  background-color: #1C2333;
+  background-color: #2B2C2A;
   border-radius: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -112,8 +108,8 @@ input[type="number"] {
 }
 
 .card-glow:hover {
-  box-shadow: 0 0 20px rgba(182, 80, 158, 0.15), 0 0 40px rgba(46, 186, 198, 0.1);
-  border-color: rgba(182, 80, 158, 0.3);
+  box-shadow: 0 0 20px rgba(214, 255, 52, 0.15), 0 0 40px rgba(214, 255, 52, 0.05);
+  border-color: rgba(214, 255, 52, 0.3);
   transition: all 0.3s;
 }
 
@@ -130,13 +126,13 @@ input[type="number"] {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #B6509E, #2EBAC6);
-  color: white;
+  background: #D6FF34;
+  color: #000000;
 }
 
 .btn-primary:hover {
   opacity: 0.9;
-  box-shadow: 0 0 20px rgba(182, 80, 158, 0.3);
+  box-shadow: 0 0 20px rgba(214, 255, 52, 0.3);
 }
 
 .btn-primary:active {
@@ -160,7 +156,7 @@ input[type="number"] {
 
 .btn-ghost {
   background-color: transparent;
-  color: #94A3B8;
+  color: #A0A0A0;
 }
 
 .btn-ghost:hover {
@@ -170,7 +166,7 @@ input[type="number"] {
 
 /* === INPUT STYLING === */
 .input {
-  background-color: #1C2333;
+  background-color: #2B2C2A;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 0.75rem;
   padding: 0.75rem 1rem;
@@ -178,13 +174,13 @@ input[type="number"] {
 }
 
 .input::placeholder {
-  color: #64748B;
+  color: #666666;
 }
 
 .input:focus {
   outline: none;
-  border-color: #B6509E;
-  box-shadow: 0 0 0 2px rgba(182, 80, 158, 0.2);
+  border-color: #D6FF34;
+  box-shadow: 0 0 0 2px rgba(214, 255, 52, 0.2);
 }
 
 /* === TYPOGRAPHY === */
@@ -197,7 +193,7 @@ input[type="number"] {
 .text-rate {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #2EBAC6;
+  color: #D6FF34;
 }
 
 .text-earnings {
@@ -209,7 +205,7 @@ input[type="number"] {
 /* === LOADING ANIMATION (dark shimmer) === */
 .loading-pulse {
   animation: shimmer 2s linear infinite;
-  background: linear-gradient(90deg, #1C2333 25%, #21273A 50%, #1C2333 75%);
+  background: linear-gradient(90deg, #2B2C2A 25%, #3A3B38 50%, #2B2C2A 75%);
   background-size: 200% 100%;
 }
 
@@ -245,16 +241,16 @@ input[type="number"] {
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background-color: #161B22;
+  background-color: #111110;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #21273A;
+  background-color: #3A3B38;
   border-radius: 9999px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: #2A3441;
+  background-color: #4A4B48;
 }
 
 /* === TABULAR NUMBERS === */
@@ -264,9 +260,9 @@ input[type="number"] {
 
 /* === GLOW EFFECTS === */
 .glow-accent {
-  box-shadow: 0 0 20px rgba(182, 80, 158, 0.2), 0 0 40px rgba(46, 186, 198, 0.1);
+  box-shadow: 0 0 20px rgba(214, 255, 52, 0.2), 0 0 40px rgba(214, 255, 52, 0.1);
 }
 
 .glow-accent-sm {
-  box-shadow: 0 0 10px rgba(182, 80, 158, 0.15);
+  box-shadow: 0 0 10px rgba(214, 255, 52, 0.15);
 }

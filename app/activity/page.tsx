@@ -100,7 +100,7 @@ function ActivityContent() {
       {/* Header */}
       <div className="space-y-2">
         <h1 className="text-2xl font-bold text-white">Activity</h1>
-        <p className="text-slate-400">Your transaction history</p>
+        <p className="text-[#A0A0A0]">Your transaction history</p>
       </div>
 
       {/* Filters */}
@@ -117,8 +117,8 @@ function ActivityContent() {
               onClick={() => setFilter(item.key as any)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                 filter === item.key
-                  ? 'gradient-bg text-white shadow-lg'
-                  : 'bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10 hover:text-white'
+                  ? 'bg-[#D6FF34] text-white shadow-lg'
+                  : 'bg-white/5 text-[#A0A0A0] border border-white/10 hover:bg-white/10 hover:text-white'
               }`}
             >
               {item.label}
@@ -139,7 +139,7 @@ function ActivityContent() {
               className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
                 accountFilter === item.key
                   ? 'bg-white/10 border border-white/20 text-white'
-                  : 'bg-white/5 text-slate-500 border border-white/5 hover:bg-white/8 hover:text-slate-300'
+                  : 'bg-white/5 text-[#666666] border border-white/5 hover:bg-white/8 hover:text-[#A0A0A0]'
               }`}
             >
               {item.label}
@@ -159,7 +159,7 @@ function ActivityContent() {
       {isLoading && (
         <div className="space-y-3">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="p-4 bg-[#1C2333] border border-white/10 rounded-2xl">
+            <div key={i} className="p-4 bg-[#2B2C2A] border border-white/10 rounded-2xl">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   <div className="w-10 h-10 rounded-full loading-pulse" />
@@ -185,12 +185,12 @@ function ActivityContent() {
               className="text-center py-12"
             >
               <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4 mx-auto">
-                <svg className="w-8 h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-8 h-8 text-[#666666]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
               <h3 className="text-lg font-medium text-white mb-2">No transactions found</h3>
-              <p className="text-slate-500">
+              <p className="text-[#666666]">
                 {transactions.length === 0 ? 'Make your first deposit to see activity here' : 'Try adjusting your filters'}
               </p>
             </motion.div>
@@ -201,7 +201,7 @@ function ActivityContent() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="p-4 bg-[#1C2333] border border-white/10 rounded-2xl hover:border-white/20 transition-all"
+                className="p-4 bg-[#2B2C2A] border border-white/10 rounded-2xl hover:border-white/20 transition-all"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
@@ -230,7 +230,7 @@ function ActivityContent() {
                           completed
                         </span>
                       </div>
-                      <div className="flex items-center space-x-2 text-sm text-slate-500">
+                      <div className="flex items-center space-x-2 text-sm text-[#666666]">
                         <span>{transaction.account}</span>
                         <span>&bull;</span>
                         <span>{formatDate(transaction.date)}</span>
@@ -239,7 +239,7 @@ function ActivityContent() {
                           href={`https://basescan.org/tx/${transaction.hash}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="font-mono gradient-text hover:opacity-80 underline"
+                          className="font-mono text-[#D6FF34] hover:opacity-80 underline"
                         >
                           {transaction.hash.slice(0, 6)}...{transaction.hash.slice(-4)}
                         </a>

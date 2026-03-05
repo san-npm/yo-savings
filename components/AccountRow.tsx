@@ -22,19 +22,21 @@ const getCurrencyIcon = (accountId: string) => {
     case 'dollar':
       return (
         <div className="relative">
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-green-400 to-green-600 blur-sm opacity-40" />
-          <div className={`${iconClass} bg-gradient-to-br from-green-400 to-green-600 relative`}>$</div>
+          <div className="absolute inset-0 rounded-full bg-[#00FF8B] blur-sm opacity-40" />
+          <div className={`${iconClass} bg-[#00FF8B] relative`}>
+            <span className="text-black">$</span>
+          </div>
         </div>
       );
     case 'euro':
       return (
         <div className="relative">
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 blur-sm opacity-40" />
-          <div className={`${iconClass} bg-gradient-to-br from-blue-400 to-blue-600 relative`}>&#8364;</div>
+          <div className="absolute inset-0 rounded-full bg-[#4E6FFF] blur-sm opacity-40" />
+          <div className={`${iconClass} bg-[#4E6FFF] relative`}>&#8364;</div>
         </div>
       );
     default:
-      return <div className={`${iconClass} bg-slate-600`}>{accountId[0].toUpperCase()}</div>;
+      return <div className={`${iconClass} bg-[#666666]`}>{accountId[0].toUpperCase()}</div>;
   }
 };
 
@@ -49,12 +51,16 @@ export function AccountRow({
     return <AccountRowSkeleton />;
   }
 
+  const hoverColor = account.id === 'dollar'
+    ? 'hover:shadow-[0_0_20px_rgba(0,255,139,0.1)]'
+    : 'hover:shadow-[0_0_20px_rgba(78,111,255,0.1)]';
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
-      className="bg-[#1C2333] border border-white/10 rounded-2xl hover:border-white/20 hover:shadow-[0_0_20px_rgba(182,80,158,0.1)] transition-all"
+      className={`bg-[#2B2C2A] border border-white/10 rounded-2xl hover:border-white/20 ${hoverColor} transition-all`}
     >
       <Link
         href={`/accounts/${account.id}`}
@@ -68,7 +74,7 @@ export function AccountRow({
               {account.displayName}
             </h3>
             <div className="flex items-center space-x-2">
-              <p className="text-sm gradient-text font-medium">
+              <p className="text-sm text-[#D6FF34] font-medium">
                 {formatPercentage(annualRate)} annual rate
               </p>
               {balance > 0 && (

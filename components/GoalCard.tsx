@@ -31,14 +31,14 @@ export function GoalCard({ goal, onEdit, onDelete, index = 0 }: GoalCardProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
-      className="p-4 bg-[#1C2333] border border-white/10 rounded-2xl hover:border-white/20 transition-all"
+      className="p-4 bg-[#2B2C2A] border border-white/10 rounded-2xl hover:border-white/20 transition-all"
     >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-3">
           <span className="text-xl">{goal.emoji}</span>
           <div>
             <h3 className="font-medium text-white">{goal.name}</h3>
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-[#A0A0A0]">
               Linked to {account.displayName}
             </p>
           </div>
@@ -49,7 +49,7 @@ export function GoalCard({ goal, onEdit, onDelete, index = 0 }: GoalCardProps) {
             <div className="text-sm font-semibold text-white tabular-nums">
               {formatCurrency(goal.currentAmount, currency)}
             </div>
-            <div className="text-xs text-slate-500">
+            <div className="text-xs text-[#666666]">
               of {formatCurrency(goal.targetAmount, currency)}
             </div>
           </div>
@@ -62,7 +62,7 @@ export function GoalCard({ goal, onEdit, onDelete, index = 0 }: GoalCardProps) {
               }}
               className="p-1 hover:bg-white/10 rounded-lg transition-colors"
             >
-              <svg className="w-4 h-4 text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-[#A0A0A0]" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
               </svg>
             </button>
@@ -71,11 +71,11 @@ export function GoalCard({ goal, onEdit, onDelete, index = 0 }: GoalCardProps) {
               <motion.div
                 initial={{ opacity: 0, y: 5 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="absolute right-0 mt-1 w-32 bg-[#21273A] border border-white/10 rounded-lg shadow-lg z-10"
+                className="absolute right-0 mt-1 w-32 bg-[#3A3B38] border border-white/10 rounded-lg shadow-lg z-10"
               >
                 <button
                   onClick={(e) => { e.stopPropagation(); setShowMenu(false); onEdit?.(); }}
-                  className="w-full px-3 py-2 text-sm text-slate-300 hover:bg-white/5 rounded-t-lg transition-colors text-left"
+                  className="w-full px-3 py-2 text-sm text-[#A0A0A0] hover:bg-white/5 rounded-t-lg transition-colors text-left"
                 >
                   Edit Goal
                 </button>
@@ -96,15 +96,9 @@ export function GoalCard({ goal, onEdit, onDelete, index = 0 }: GoalCardProps) {
         <div className="relative w-12 h-12 flex-shrink-0">
           <svg className="w-12 h-12 transform -rotate-90" viewBox="0 0 48 48">
             <circle cx="24" cy="24" r="20" stroke="rgba(255,255,255,0.1)" strokeWidth="4" fill="none" />
-            <defs>
-              <linearGradient id={`goalGrad-${goal.id}`} x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#B6509E" />
-                <stop offset="100%" stopColor="#2EBAC6" />
-              </linearGradient>
-            </defs>
             <motion.circle
               cx="24" cy="24" r="20"
-              stroke={`url(#goalGrad-${goal.id})`}
+              stroke="#D6FF34"
               strokeWidth="4"
               fill="none"
               strokeLinecap="round"
@@ -123,15 +117,15 @@ export function GoalCard({ goal, onEdit, onDelete, index = 0 }: GoalCardProps) {
 
         <div className="flex-1">
           <div className="flex items-center justify-between text-sm mb-1">
-            <span className="text-slate-400">Progress</span>
-            <span className="gradient-text font-medium">
+            <span className="text-[#A0A0A0]">Progress</span>
+            <span className="text-[#D6FF34] font-medium">
               {formatCurrency(goal.targetAmount - goal.currentAmount, currency)} to go
             </span>
           </div>
 
           <div className="w-full bg-white/10 rounded-full h-2">
             <motion.div
-              className="h-2 rounded-full gradient-bg"
+              className="h-2 rounded-full bg-[#D6FF34]"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 1.5, ease: "easeOut" }}
@@ -155,7 +149,7 @@ export function GoalCard({ goal, onEdit, onDelete, index = 0 }: GoalCardProps) {
         <div className="mt-3 pt-3 border-t border-white/10">
           <Link
             href={`/deposit?account=${goal.linkedAccountId}&goal=${goal.id}`}
-            className="w-full inline-flex items-center justify-center px-4 py-2 text-white text-sm font-medium rounded-lg gradient-bg hover:opacity-90 transition-opacity"
+            className="w-full inline-flex items-center justify-center px-4 py-2 text-black text-sm font-medium rounded-lg bg-[#D6FF34] hover:opacity-90 transition-opacity"
           >
             Add Funds
           </Link>

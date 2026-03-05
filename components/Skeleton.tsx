@@ -28,7 +28,7 @@ export function BalanceSkeleton() {
 
 export function AccountRowSkeleton() {
   return (
-    <div className="bg-[#1C2333] border border-white/10 rounded-2xl p-4">
+    <div className="bg-[#2B2C2A] border border-white/10 rounded-2xl p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <Skeleton className="w-8 h-8 rounded-full" />

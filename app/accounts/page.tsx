@@ -55,11 +55,11 @@ function AccountsContent() {
     >
       <div>
         <h1 className="text-2xl font-bold text-white">Savings Accounts</h1>
-        <p className="text-slate-400 mt-1">Your money, earning more every day</p>
+        <p className="text-[#A0A0A0] mt-1">Your money, earning more every day</p>
       </div>
 
       <div className="space-y-4">
-        <div className="text-sm font-medium text-slate-500 flex items-center justify-between">
+        <div className="text-sm font-medium text-[#666666] flex items-center justify-between">
           <span>Available Accounts</span>
           <span>Balance</span>
         </div>
@@ -80,17 +80,17 @@ function AccountsContent() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="p-4 bg-[#1C2333] border border-white/10 rounded-xl"
+        className="p-4 bg-[#2B2C2A] border border-white/10 rounded-xl"
       >
         <div className="flex items-center space-x-2 mb-2">
           <div className="w-5 h-5 bg-white/5 rounded flex items-center justify-center">
-            <svg className="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3 h-3 text-[#A0A0A0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
           </div>
           <span className="text-sm font-medium text-white">Account Summary</span>
         </div>
-        <div className="space-y-1 text-xs text-slate-500">
+        <div className="space-y-1 text-xs text-[#666666]">
           <p>&bull; All accounts earn interest daily</p>
           <p>&bull; No minimum balance requirements</p>
           <p>&bull; Withdraw anytime with no penalties</p>

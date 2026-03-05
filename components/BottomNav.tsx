@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { usePrivy } from '@privy-io/react-auth';
 import { cn } from '@/lib/utils';
 
 const HomeIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
@@ -31,25 +32,30 @@ const SettingsIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
   </svg>
 );
 
-const navItems = [
-  { href: '/', icon: HomeIcon, label: 'Home' },
-  { href: '/accounts', icon: AccountsIcon, label: 'Accounts' },
-  { href: '/activity', icon: ActivityIcon, label: 'Activity' },
-  { href: '/settings', icon: SettingsIcon, label: 'Settings' },
+const allNavItems = [
+  { href: '/', icon: HomeIcon, label: 'Home', requiresAuth: false },
+  { href: '/accounts', icon: AccountsIcon, label: 'Accounts', requiresAuth: true },
+  { href: '/activity', icon: ActivityIcon, label: 'Activity', requiresAuth: true },
+  { href: '/settings', icon: SettingsIcon, label: 'Settings', requiresAuth: true },
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
+  const { authenticated } = usePrivy();
 
   if (pathname.startsWith('/onboard') || pathname.startsWith('/deposit') || pathname.startsWith('/withdraw')) {
     return null;
   }
 
+  const navItems = authenticated
+    ? allNavItems
+    : allNavItems.filter(item => !item.requiresAuth);
+
   return (
     <motion.nav
       initial={{ y: 100 }}
       animate={{ y: 0 }}
-      className="fixed bottom-0 left-0 right-0 bg-[#0E1117]/80 backdrop-blur-xl border-t border-white/10 safe-area-pb"
+      className="fixed bottom-0 left-0 right-0 bg-black/80 backdrop-blur-xl border-t border-white/10 safe-area-pb"
     >
       <div className="flex items-center justify-around px-4 py-2">
         {navItems.map((item) => {
@@ -64,28 +70,26 @@ export function BottomNav() {
               href={item.href}
               className={cn(
                 'flex flex-col items-center justify-center min-w-0 flex-1 py-2 px-1 rounded-xl transition-colors relative',
-                isActive ? 'text-white' : 'text-slate-500'
+                isActive ? 'text-[#D6FF34]' : 'text-[#666666]'
               )}
             >
-              <div className={cn(
-                'mb-1',
-                isActive && 'gradient-text'
-              )}>
+              <div className="mb-1">
                 <item.icon className={cn(
                   'w-5 h-5',
-                  isActive && 'stroke-[#B6509E]'
+                  isActive && 'stroke-[#D6FF34]'
                 )} />
               </div>
               <span className={cn(
                 'text-xs font-medium truncate',
-                isActive ? 'gradient-text' : 'text-slate-500'
+                isActive ? 'text-[#D6FF34]' : 'text-[#666666]'
               )}>
                 {item.label}
               </span>
               {isActive && (
                 <motion.div
                   layoutId="activeTab"
-                  className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full gradient-bg"
+                  className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full bg-[#D6FF34]"
+                  style={{ boxShadow: '0 0 8px rgba(214,255,52,0.4)' }}
                   transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                 />
               )}

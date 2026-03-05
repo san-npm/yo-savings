@@ -55,7 +55,7 @@ function CustomTooltip({ active, payload }: any) {
   if (!active || !payload?.length) return null;
   const data = payload[0].payload;
   return (
-    <div className="bg-[#21273A] border border-white/10 rounded-lg px-3 py-2 shadow-xl">
+    <div className="bg-[#2B2C2A] border border-white/10 rounded-lg px-3 py-2 shadow-xl">
       <div className="text-sm font-semibold text-white tabular-nums">
         ${data.balance.toLocaleString()}
       </div>
@@ -67,7 +67,7 @@ function CustomTooltip({ active, payload }: any) {
 }
 
 export function SimulationChart({
-  currentApy = 8,
+  currentApy = 0,
   accountCurrencySymbol = '$',
 }: SimulationChartProps) {
   const [amount, setAmount] = useState('1000');
@@ -88,20 +88,22 @@ export function SimulationChart({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-5 bg-[#1C2333] border border-white/10 rounded-2xl space-y-5"
+      className="p-5 bg-[#2B2C2A] border border-white/10 rounded-2xl space-y-5"
     >
       <div className="flex items-center justify-between">
         <h3 className="text-base font-semibold text-white">Growth Simulator</h3>
-        <span className="text-xs text-slate-500">
-          Based on {currentApy}% APY
+        <span className="text-xs text-[#666666]">
+          {currentApy > 0
+            ? `Based on ${currentApy.toFixed(1)}% APY (7d)`
+            : 'Loading rate...'}
         </span>
       </div>
 
       {/* Deposit Amount Input */}
       <div className="space-y-3">
-        <label className="text-xs text-slate-500">Deposit amount</label>
+        <label className="text-xs text-[#666666]">Deposit amount</label>
         <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-lg">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#666666] text-lg">
             {accountCurrencySymbol}
           </span>
           <input
@@ -112,7 +114,7 @@ export function SimulationChart({
               const cleaned = e.target.value.replace(/[^0-9.]/g, '');
               setAmount(cleaned);
             }}
-            className="w-full pl-8 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-lg font-semibold tabular-nums outline-none focus:border-white/20 transition-colors"
+            className="w-full pl-8 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-lg font-semibold tabular-nums outline-none focus:border-[#D6FF34]/50 transition-colors"
           />
         </div>
 
@@ -126,7 +128,7 @@ export function SimulationChart({
               className={`flex-1 py-1.5 text-xs font-medium rounded-lg border transition-all ${
                 amount === qa.toString()
                   ? 'bg-white/10 border-white/20 text-white'
-                  : 'bg-white/5 border-white/5 text-slate-500 hover:text-slate-300 hover:border-white/10'
+                  : 'bg-white/5 border-white/5 text-[#666666] hover:text-[#A0A0A0] hover:border-white/10'
               }`}
             >
               ${qa.toLocaleString()}
@@ -143,8 +145,8 @@ export function SimulationChart({
             onClick={() => setPeriod(p.key)}
             className={`flex-1 py-2 text-sm font-medium rounded-xl border transition-all ${
               period === p.key
-                ? 'gradient-bg text-white border-transparent shadow-lg'
-                : 'bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/8'
+                ? 'bg-[#D6FF34] text-black border-transparent shadow-lg'
+                : 'bg-white/5 border-white/10 text-[#A0A0A0] hover:text-white hover:bg-white/8'
             }`}
           >
             {p.label}
@@ -153,29 +155,25 @@ export function SimulationChart({
       </div>
 
       {/* Chart */}
-      {principal > 0 && (
+      {principal > 0 && currentApy > 0 && (
         <div className="h-44">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="simGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#B6509E" stopOpacity={0.3} />
-                  <stop offset="100%" stopColor="#2EBAC6" stopOpacity={0} />
-                </linearGradient>
-                <linearGradient id="simStroke" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor="#B6509E" />
-                  <stop offset="100%" stopColor="#2EBAC6" />
+                  <stop offset="0%" stopColor="#D6FF34" stopOpacity={0.3} />
+                  <stop offset="100%" stopColor="#D6FF34" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <XAxis
                 dataKey="label"
-                tick={{ fill: '#64748B', fontSize: 10 }}
+                tick={{ fill: '#666666', fontSize: 10 }}
                 axisLine={false}
                 tickLine={false}
                 interval="preserveStartEnd"
               />
               <YAxis
-                tick={{ fill: '#64748B', fontSize: 10 }}
+                tick={{ fill: '#666666', fontSize: 10 }}
                 axisLine={false}
                 tickLine={false}
                 tickFormatter={(v) => `$${(v / 1000).toFixed(v >= 1000 ? 1 : 0)}${v >= 1000 ? 'k' : ''}`}
@@ -184,9 +182,10 @@ export function SimulationChart({
               <Area
                 type="monotone"
                 dataKey="balance"
-                stroke="url(#simStroke)"
+                stroke="#D6FF34"
                 strokeWidth={2}
                 fill="url(#simGradient)"
+                animationDuration={800}
               />
             </AreaChart>
           </ResponsiveContainer>
@@ -194,10 +193,10 @@ export function SimulationChart({
       )}
 
       {/* Projected Result */}
-      {principal > 0 && (
+      {principal > 0 && currentApy > 0 && (
         <div className="grid grid-cols-2 gap-3">
           <div className="p-3 bg-white/5 rounded-xl border border-white/5">
-            <p className="text-xs text-slate-500 mb-1">Projected Total</p>
+            <p className="text-xs text-[#666666] mb-1">Projected Total</p>
             <p className="text-lg font-semibold text-white tabular-nums">
               {accountCurrencySymbol}{finalBalance.toLocaleString()}
             </p>
@@ -211,7 +210,7 @@ export function SimulationChart({
         </div>
       )}
 
-      <p className="text-[10px] text-slate-600 text-center">
+      <p className="text-[10px] text-[#666666] text-center">
         Projections are estimates based on current APY and may vary. Past performance does not guarantee future results.
       </p>
     </motion.div>

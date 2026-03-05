@@ -9,12 +9,12 @@ interface ConfettiProps {
 }
 
 const confettiColors = [
-  '#10B981', // emerald-500 (primary)
-  '#6366F1', // indigo-500
-  '#F59E0B', // amber-500
-  '#EF4444', // red-500
-  '#8B5CF6', // violet-500
-  '#06B6D4', // cyan-500
+  '#D6FF34', // neon green (brand)
+  '#00FF8B', // vault usd
+  '#4E6FFF', // vault eur
+  '#FFAF4F', // vault btc
+  '#FFBF00', // vault gold
+  '#DA6AFF', // vault sol
 ];
 
 function ConfettiPiece({ delay, color }: { delay: number; color: string }) {

@@ -12,6 +12,7 @@ import { BalanceCard } from '@/components/BalanceCard';
 import { AccountRow } from '@/components/AccountRow';
 import { SimulationChart } from '@/components/SimulationChart';
 import { getAllAccounts, type SavingsAccount } from '@/lib/accounts';
+import { YO_VAULT_ADDRESSES } from '@/lib/constants';
 
 function AccountWithData({
   account,
@@ -60,11 +61,42 @@ interface RecentTransaction {
   status: 'completed';
 }
 
+function FloatingDot({ delay, x, y }: { delay: number; x: string; y: string }) {
+  return (
+    <motion.div
+      className="absolute w-1.5 h-1.5 rounded-full bg-[#D6FF34]"
+      style={{ left: x, top: y, opacity: 0.4 }}
+      animate={{
+        y: [0, -8, 0],
+        opacity: [0.2, 0.6, 0.2],
+      }}
+      transition={{
+        duration: 4,
+        delay,
+        repeat: Infinity,
+        ease: 'easeInOut',
+      }}
+    />
+  );
+}
+
 export default function HomePage() {
   const { wallets } = useWallets();
   const { ready, authenticated, user } = usePrivy();
   const { login } = useLogin();
   const { client } = useYoClient();
+
+  // Fetch vault snapshots for landing page (no auth needed)
+  const { snapshot: usdSnapshot } = useVaultSnapshot(
+    YO_VAULT_ADDRESSES.yoUSD as `0x${string}`
+  );
+  const { snapshot: eurSnapshot } = useVaultSnapshot(
+    YO_VAULT_ADDRESSES.yoEUR as `0x${string}`
+  );
+
+  const usdApy = parseFloat(usdSnapshot?.stats?.yield?.['7d'] ?? '0');
+  const eurApy = parseFloat(eurSnapshot?.stats?.yield?.['7d'] ?? '0');
+  const bestApy = Math.max(usdApy, eurApy);
 
   const embeddedWallet = wallets.find(w => w.walletClientType === 'privy');
   const address = embeddedWallet?.address as `0x${string}` | undefined;
@@ -162,24 +194,38 @@ export default function HomePage() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="min-h-[85vh] flex flex-col items-center justify-center px-4 -mt-6"
+        className="min-h-[85vh] flex flex-col items-center justify-center px-4 -mt-6 relative"
       >
+        {/* Decorative background glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] pointer-events-none decorative-glow" />
+
+        {/* Floating neon dots */}
+        <FloatingDot delay={0} x="15%" y="20%" />
+        <FloatingDot delay={1.2} x="80%" y="30%" />
+        <FloatingDot delay={2.4} x="25%" y="70%" />
+        <FloatingDot delay={0.8} x="75%" y="65%" />
+
         <motion.div
           initial={{ scale: 0.9 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.2 }}
-          className="text-center space-y-8 max-w-md"
+          className="text-center space-y-8 max-w-md relative z-10"
         >
           <div>
-            {/* Animated gradient orb */}
+            {/* Pulsing neon green orb */}
             <motion.div
               className="w-20 h-20 rounded-full mx-auto mb-6 relative"
               animate={{ scale: [1, 1.05, 1] }}
               transition={{ duration: 3, repeat: Infinity, repeatType: 'reverse' }}
             >
-              <div className="absolute inset-0 rounded-full gradient-bg opacity-60 blur-md" />
-              <div className="absolute inset-0 rounded-full gradient-bg flex items-center justify-center">
-                <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div
+                className="absolute inset-0 rounded-full bg-[#D6FF34] opacity-30 blur-xl"
+              />
+              <div
+                className="absolute inset-0 rounded-full bg-[#D6FF34] flex items-center justify-center"
+                style={{ boxShadow: '0 0 60px rgba(214,255,52,0.3)' }}
+              >
+                <svg className="w-10 h-10 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                 </svg>
               </div>
@@ -187,28 +233,61 @@ export default function HomePage() {
 
             <h1 className="text-3xl font-bold text-white mb-4">
               Your savings,<br />
-              <span className="gradient-text">earning more</span>
+              <span className="text-[#D6FF34]">earning more</span>
             </h1>
 
-            <p className="text-lg text-slate-400 mb-8">
-              Open a savings account in 30 seconds.<br />
-              Earn competitive interest rates, <span className="gradient-text font-semibold">automatically</span>.
+            <p className="text-lg text-[#A0A0A0] mb-6">
+              {bestApy > 0
+                ? <>Earn up to <span className="text-[#D6FF34] font-semibold">{bestApy.toFixed(1)}%</span> per year, automatically.</>
+                : <>Open a savings account in 30 seconds. Earn competitive rates, <span className="text-[#D6FF34] font-semibold">automatically</span>.</>
+              }
             </p>
+
+            {/* Mini APY cards */}
+            {(usdApy > 0 || eurApy > 0) && (
+              <div className="flex gap-3 justify-center mb-2">
+                {usdApy > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4 }}
+                    className="px-4 py-2.5 bg-[#2B2C2A] border border-white/10 rounded-xl"
+                    style={{ boxShadow: '0 0 12px rgba(0,255,139,0.1)' }}
+                  >
+                    <p className="text-xs text-[#A0A0A0] mb-0.5">Dollar Savings</p>
+                    <p className="text-lg font-semibold text-[#00FF8B] tabular-nums">{usdApy.toFixed(1)}%</p>
+                  </motion.div>
+                )}
+                {eurApy > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="px-4 py-2.5 bg-[#2B2C2A] border border-white/10 rounded-xl"
+                    style={{ boxShadow: '0 0 12px rgba(78,111,255,0.1)' }}
+                  >
+                    <p className="text-xs text-[#A0A0A0] mb-0.5">Euro Savings</p>
+                    <p className="text-lg font-semibold text-[#4E6FFF] tabular-nums">{eurApy.toFixed(1)}%</p>
+                  </motion.div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="space-y-4">
             <motion.button
               whileTap={{ scale: 0.95 }}
+              whileHover={{ scale: 1.02 }}
               onClick={login}
               disabled={!ready}
-              className="w-full h-14 rounded-xl font-semibold text-white text-lg gradient-bg disabled:opacity-50 transition-all"
-              style={{ boxShadow: '0 0 30px rgba(182, 80, 158, 0.3)' }}
+              className="w-full h-14 rounded-xl font-semibold text-black text-lg bg-[#D6FF34] disabled:opacity-50 transition-all"
+              style={{ boxShadow: '0 0 30px rgba(214,255,52,0.3)' }}
             >
               Get Started
             </motion.button>
 
-            <p className="text-xs text-slate-500">
-              Simple and secure &bull; Powered by audited protocols
+            <p className="text-xs text-[#666666]">
+              Simple and secure &bull; Powered by Yo Protocol
             </p>
           </div>
         </motion.div>
@@ -234,9 +313,10 @@ export default function HomePage() {
         <Link href="/deposit">
           <motion.div
             whileTap={{ scale: 0.95 }}
-            className="p-4 bg-[#1C2333] border border-white/10 rounded-2xl flex items-center justify-center space-x-2 hover:border-accent-purple/30 hover:shadow-[0_0_15px_rgba(182,80,158,0.1)] transition-all"
+            whileHover={{ scale: 1.02 }}
+            className="p-4 bg-[#2B2C2A] border border-white/10 rounded-2xl flex items-center justify-center space-x-2 hover:border-[#D6FF34]/30 hover:shadow-[0_0_15px_rgba(214,255,52,0.1)] transition-all"
           >
-            <svg className="w-5 h-5 text-accent-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-[#D6FF34]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
             <span className="font-medium text-white">Deposit</span>
@@ -245,9 +325,10 @@ export default function HomePage() {
         <Link href="/withdraw">
           <motion.div
             whileTap={{ scale: 0.95 }}
-            className="p-4 bg-[#1C2333] border border-white/10 rounded-2xl flex items-center justify-center space-x-2 hover:border-accent-teal/30 hover:shadow-[0_0_15px_rgba(46,186,198,0.1)] transition-all"
+            whileHover={{ scale: 1.02 }}
+            className="p-4 bg-[#2B2C2A] border border-white/10 rounded-2xl flex items-center justify-center space-x-2 hover:border-[#D6FF34]/30 hover:shadow-[0_0_15px_rgba(214,255,52,0.1)] transition-all"
           >
-            <svg className="w-5 h-5 text-accent-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-[#D6FF34]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 20V4m8 8H4" />
             </svg>
             <span className="font-medium text-white">Withdraw</span>
@@ -258,7 +339,7 @@ export default function HomePage() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-white">Savings Accounts</h2>
-          <Link href="/deposit" className="text-sm gradient-text font-medium">
+          <Link href="/deposit" className="text-sm text-[#D6FF34] font-medium">
             Add money
           </Link>
         </div>
@@ -276,29 +357,29 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Growth Simulator */}
-      <SimulationChart currentApy={averageAPY || 8} />
+      {/* Growth Simulator — pass real APY */}
+      <SimulationChart currentApy={averageAPY || 0} />
 
       {/* Goals Section Link */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-white">Savings Goals</h2>
-          <Link href="/goals" className="text-sm gradient-text font-medium">View all</Link>
+          <Link href="/goals" className="text-sm text-[#D6FF34] font-medium">View all</Link>
         </div>
 
         <Link
           href="/goals"
-          className="block bg-[#1C2333] border border-white/10 rounded-2xl hover:border-white/20 transition-all p-4"
+          className="block bg-[#2B2C2A] border border-white/10 rounded-2xl hover:border-white/20 transition-all p-4"
         >
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center gradient-bg">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[#D6FF34]">
+              <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
               </svg>
             </div>
             <div>
               <h3 className="font-medium text-white">Create your first goal</h3>
-              <p className="text-sm text-slate-400">Set targets and track progress</p>
+              <p className="text-sm text-[#A0A0A0]">Set targets and track progress</p>
             </div>
           </div>
         </Link>
@@ -308,13 +389,13 @@ export default function HomePage() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-semibold text-white">Recent Activity</h2>
-          <Link href="/activity" className="text-sm gradient-text font-medium">See all</Link>
+          <Link href="/activity" className="text-sm text-[#D6FF34] font-medium">See all</Link>
         </div>
 
         <div className="space-y-3">
           {transactionsLoading ? (
             [...Array(3)].map((_, i) => (
-              <div key={i} className="flex items-center justify-between p-3 bg-[#1C2333] border border-white/10 rounded-xl">
+              <div key={i} className="flex items-center justify-between p-3 bg-[#2B2C2A] border border-white/10 rounded-xl">
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 rounded-full loading-pulse" />
                   <div className="space-y-1">
@@ -326,9 +407,9 @@ export default function HomePage() {
               </div>
             ))
           ) : recentTransactions.length === 0 ? (
-            <div className="p-6 text-center bg-[#1C2333] border border-white/10 rounded-xl">
-              <p className="text-sm text-slate-400">No recent activity</p>
-              <p className="text-xs text-slate-500">Make your first deposit to see activity here</p>
+            <div className="p-6 text-center bg-[#2B2C2A] border border-white/10 rounded-xl">
+              <p className="text-sm text-[#A0A0A0]">No recent activity</p>
+              <p className="text-xs text-[#666666]">Make your first deposit to see activity here</p>
             </div>
           ) : (
             recentTransactions.map((transaction, index) => (
@@ -337,13 +418,13 @@ export default function HomePage() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="flex items-center justify-between p-3 bg-[#1C2333] border border-white/10 rounded-xl"
+                className="flex items-center justify-between p-3 bg-[#2B2C2A] border border-white/10 rounded-xl"
               >
                 <div className="flex items-center space-x-3">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                     transaction.type === 'deposit'
                       ? 'bg-green-500/15 text-green-400'
-                      : 'bg-white/5 text-slate-400'
+                      : 'bg-white/5 text-[#A0A0A0]'
                   }`}>
                     {transaction.type === 'deposit' ? '\u2193' : '\u2191'}
                   </div>
@@ -351,14 +432,14 @@ export default function HomePage() {
                     <p className="font-medium text-white text-sm">
                       {transaction.type === 'deposit' ? 'Deposit' : 'Withdraw'}
                     </p>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-[#666666]">
                       {transaction.account} &bull; {transaction.date}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
                   <p className={`font-semibold text-sm ${
-                    transaction.type === 'deposit' ? 'text-green-400' : 'text-slate-300'
+                    transaction.type === 'deposit' ? 'text-green-400' : 'text-[#A0A0A0]'
                   }`}>
                     {transaction.type === 'deposit' ? '+' : '-'}${transaction.amount.toLocaleString()}
                   </p>
@@ -374,17 +455,17 @@ export default function HomePage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-4 rounded-2xl gradient-bg-subtle border border-white/10"
+          className="p-4 rounded-2xl bg-[#D6FF34]/10 border border-[#D6FF34]/20"
         >
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center gradient-bg">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[#D6FF34]">
+              <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
               </svg>
             </div>
             <div>
               <h3 className="font-medium text-white">Earning Interest</h3>
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-[#A0A0A0]">
                 Your ${totalBalance.toLocaleString(undefined, { maximumFractionDigits: 2 })} is earning interest daily.
                 Keep saving to reach your goals faster.
               </p>

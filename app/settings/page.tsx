@@ -47,7 +47,7 @@ function SettingsContent() {
       {/* Header */}
       <div className="space-y-2">
         <h1 className="text-2xl font-bold text-white">Settings</h1>
-        <p className="text-slate-400">Manage your account and preferences</p>
+        <p className="text-[#A0A0A0]">Manage your account and preferences</p>
       </div>
 
       {/* Profile Section */}
@@ -57,12 +57,12 @@ function SettingsContent() {
         transition={{ delay: 0.1 }}
         className="space-y-3"
       >
-        <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wider">Account</h2>
+        <h2 className="text-sm font-medium text-[#666666] uppercase tracking-wider">Account</h2>
 
-        <div className="p-4 bg-[#1C2333] border border-white/10 rounded-2xl">
+        <div className="p-4 bg-[#2B2C2A] border border-white/10 rounded-2xl">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 rounded-full flex items-center justify-center gradient-bg">
-              <span className="text-white font-semibold text-lg">
+            <div className="w-12 h-12 rounded-full flex items-center justify-center bg-[#D6FF34]">
+              <span className="text-black font-semibold text-lg">
                 {user?.email?.address?.[0]?.toUpperCase() || 'U'}
               </span>
             </div>
@@ -70,7 +70,7 @@ function SettingsContent() {
               <p className="font-medium text-white">
                 {user?.email?.address || 'Anonymous User'}
               </p>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-[#666666]">
                 Signed in via email
               </p>
             </div>
@@ -85,32 +85,32 @@ function SettingsContent() {
         transition={{ delay: 0.15 }}
         className="space-y-3"
       >
-        <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wider">Wallet</h2>
+        <h2 className="text-sm font-medium text-[#666666] uppercase tracking-wider">Wallet</h2>
 
-        <div className="p-4 bg-[#1C2333] border border-white/10 rounded-2xl space-y-4">
+        <div className="p-4 bg-[#2B2C2A] border border-white/10 rounded-2xl space-y-4">
           <div className="flex items-start space-x-3">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center gradient-bg flex-shrink-0 mt-0.5">
-              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center bg-[#D6FF34] flex-shrink-0 mt-0.5">
+              <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-slate-300 mb-3">
+              <p className="text-sm text-[#A0A0A0] mb-3">
                 Your wallet is an embedded wallet created by Privy, secured with your email login. Only you control it.
               </p>
 
               {/* Address */}
               <div className="p-3 bg-white/5 rounded-xl border border-white/5">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs text-slate-500">Address</span>
+                  <span className="text-xs text-[#666666]">Address</span>
                   <button
                     onClick={() => address && copyToClipboard(address)}
-                    className="text-xs gradient-text hover:opacity-80 transition-opacity"
+                    className="text-xs text-[#D6FF34] hover:opacity-80 transition-opacity"
                   >
                     {copied ? 'Copied!' : 'Copy'}
                   </button>
                 </div>
-                <p className="text-xs font-mono text-slate-400 break-all">
+                <p className="text-xs font-mono text-[#A0A0A0] break-all">
                   {address || 'Not available'}
                 </p>
               </div>
@@ -119,14 +119,14 @@ function SettingsContent() {
               <div className="flex items-center justify-between mt-3">
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-green-400 rounded-full" />
-                  <span className="text-xs text-slate-500">Base (Chain ID: 8453)</span>
+                  <span className="text-xs text-[#666666]">Base (Chain ID: 8453)</span>
                 </div>
                 {address && (
                   <a
                     href={`https://basescan.org/address/${address}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs gradient-text hover:opacity-80 underline"
+                    className="text-xs text-[#D6FF34] hover:opacity-80 underline"
                   >
                     View on BaseScan
                   </a>
@@ -144,18 +144,18 @@ function SettingsContent() {
         transition={{ delay: 0.2 }}
         className="space-y-3"
       >
-        <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wider">About</h2>
+        <h2 className="text-sm font-medium text-[#666666] uppercase tracking-wider">About</h2>
 
-        <div className="p-4 bg-[#1C2333] border border-white/10 rounded-2xl">
+        <div className="p-4 bg-[#2B2C2A] border border-white/10 rounded-2xl">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center gradient-bg-subtle">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center bg-[#D6FF34]/10">
               <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <div>
-              <p className="font-medium text-white">Stash</p>
-              <p className="text-sm text-slate-500">v1.0.0</p>
+              <p className="font-medium text-white">Yo Savings</p>
+              <p className="text-sm text-[#666666]">v1.0.0</p>
             </div>
           </div>
         </div>
@@ -170,25 +170,25 @@ function SettingsContent() {
       >
         <button
           onClick={() => setShowAdvanced(!showAdvanced)}
-          className="w-full p-4 bg-[#1C2333] border border-white/10 rounded-2xl text-left hover:border-white/20 transition-all"
+          className="w-full p-4 bg-[#2B2C2A] border border-white/10 rounded-2xl text-left hover:border-white/20 transition-all"
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-white/5 rounded-full flex items-center justify-center">
-                <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-[#A0A0A0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
                 </svg>
               </div>
               <div>
                 <h3 className="font-medium text-white">Advanced</h3>
-                <p className="text-sm text-slate-500">Export keys & technical details</p>
+                <p className="text-sm text-[#666666]">Export keys & technical details</p>
               </div>
             </div>
             <motion.div
               animate={{ rotate: showAdvanced ? 180 : 0 }}
               transition={{ duration: 0.2 }}
-              className="text-slate-500"
+              className="text-[#666666]"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m19 9-7 7-7-7" />
@@ -223,7 +223,7 @@ function SettingsContent() {
                     <p className="text-sm font-medium text-amber-400">
                       {isExporting ? 'Exporting...' : 'Export Private Key'}
                     </p>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-[#666666]">
                       For advanced users only &mdash; keep secure
                     </p>
                   </div>

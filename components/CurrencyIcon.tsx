@@ -18,9 +18,9 @@ const glowSizes = {
   lg: 'w-12 h-12',
 };
 
-const gradientMap: Record<string, string> = {
-  dollar: 'from-green-400 to-green-600',
-  euro: 'from-blue-400 to-blue-600',
+const colorMap: Record<string, string> = {
+  dollar: '#00FF8B',
+  euro: '#4E6FFF',
 };
 
 const symbolMap: Record<string, string> = {
@@ -29,15 +29,21 @@ const symbolMap: Record<string, string> = {
 };
 
 export function CurrencyIcon({ accountId, size = 'md', className = '' }: CurrencyIconProps) {
-  const gradient = gradientMap[accountId] || 'from-slate-400 to-slate-600';
+  const color = colorMap[accountId] || '#666666';
   const symbol = symbolMap[accountId] || accountId[0]?.toUpperCase() || '?';
 
   return (
     <div className={`relative ${className}`}>
       {/* Glow effect */}
-      <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${gradient} blur-sm opacity-40`} />
+      <div
+        className={`absolute inset-0 rounded-full blur-sm opacity-40`}
+        style={{ backgroundColor: color }}
+      />
       {/* Icon */}
-      <div className={`${sizeClasses[size]} bg-gradient-to-br ${gradient} rounded-full flex items-center justify-center text-white font-semibold relative`}>
+      <div
+        className={`${sizeClasses[size]} rounded-full flex items-center justify-center font-semibold relative`}
+        style={{ backgroundColor: color, color: accountId === 'dollar' ? '#000' : '#fff' }}
+      >
         {symbol}
       </div>
     </div>
