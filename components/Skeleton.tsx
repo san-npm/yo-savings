@@ -10,7 +10,7 @@ export function Skeleton({ className }: SkeletonProps) {
   return (
     <div
       className={cn(
-        'animate-pulse rounded-xl bg-slate-200',
+        'rounded-xl loading-pulse',
         className
       )}
     />
@@ -20,15 +20,15 @@ export function Skeleton({ className }: SkeletonProps) {
 export function BalanceSkeleton() {
   return (
     <div className="space-y-3">
-      <Skeleton className="h-4 w-24" />
-      <Skeleton className="h-10 w-32" />
+      <Skeleton className="h-4 w-24 bg-white/10" />
+      <Skeleton className="h-10 w-32 bg-white/10" />
     </div>
   );
 }
 
 export function AccountRowSkeleton() {
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-4">
+    <div className="bg-[#1C2333] border border-white/10 rounded-2xl p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <Skeleton className="w-8 h-8 rounded-full" />

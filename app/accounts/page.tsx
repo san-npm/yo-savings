@@ -5,9 +5,9 @@ import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { useUserBalance } from '@yo-protocol/react';
 import { useVaultSnapshot } from '@/lib/useVaultSnapshot';
 import { AccountRow } from '@/components/AccountRow';
+import { AuthGate } from '@/components/AuthGate';
 import { getAllAccounts, type SavingsAccount } from '@/lib/accounts';
 
-// Extracted component to safely call hooks per-account
 function AccountWithBalance({
   account,
   address,
@@ -39,30 +39,13 @@ function AccountWithBalance({
   );
 }
 
-export default function AccountsPage() {
+function AccountsContent() {
   const { wallets } = useWallets();
-  const { authenticated } = usePrivy();
 
   const embeddedWallet = wallets.find(w => w.walletClientType === 'privy');
   const address = embeddedWallet?.address as `0x${string}` | undefined;
 
   const accounts = getAllAccounts();
-
-  if (!authenticated) {
-    return (
-      <div className="flex items-center justify-center min-h-screen px-4">
-        <div className="text-center space-y-4">
-          <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4 mx-auto">
-            <svg className="w-8 h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-            </svg>
-          </div>
-          <h1 className="text-xl font-semibold text-slate-800">Savings Accounts</h1>
-          <p className="text-slate-600">Sign in to view your accounts</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <motion.div
@@ -71,10 +54,8 @@ export default function AccountsPage() {
       className="space-y-6"
     >
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">Savings Accounts</h1>
-        <p className="text-slate-600 mt-1">
-          Your money, earning more every day
-        </p>
+        <h1 className="text-2xl font-bold text-white">Savings Accounts</h1>
+        <p className="text-slate-400 mt-1">Your money, earning more every day</p>
       </div>
 
       <div className="space-y-4">
@@ -99,15 +80,15 @@ export default function AccountsPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="p-4 bg-white rounded-xl shadow-sm"
+        className="p-4 bg-[#1C2333] border border-white/10 rounded-xl"
       >
         <div className="flex items-center space-x-2 mb-2">
-          <div className="w-5 h-5 bg-slate-100 rounded flex items-center justify-center">
-            <svg className="w-3 h-3 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-5 h-5 bg-white/5 rounded flex items-center justify-center">
+            <svg className="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
           </div>
-          <span className="text-sm font-medium text-slate-800">Account Summary</span>
+          <span className="text-sm font-medium text-white">Account Summary</span>
         </div>
         <div className="space-y-1 text-xs text-slate-500">
           <p>&bull; All accounts earn interest daily</p>
@@ -119,5 +100,13 @@ export default function AccountsPage() {
 
       <div className="pb-20" />
     </motion.div>
+  );
+}
+
+export default function AccountsPage() {
+  return (
+    <AuthGate>
+      <AccountsContent />
+    </AuthGate>
   );
 }

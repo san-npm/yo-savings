@@ -49,7 +49,7 @@ export function BottomNav() {
     <motion.nav
       initial={{ y: 100 }}
       animate={{ y: 0 }}
-      className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-slate-200 safe-area-pb"
+      className="fixed bottom-0 left-0 right-0 bg-[#0E1117]/80 backdrop-blur-xl border-t border-white/10 safe-area-pb"
     >
       <div className="flex items-center justify-around px-4 py-2">
         {navItems.map((item) => {
@@ -63,19 +63,32 @@ export function BottomNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex flex-col items-center justify-center min-w-0 flex-1 py-2 px-1 rounded-xl transition-colors',
-                isActive ? 'text-green-500' : 'text-slate-400'
+                'flex flex-col items-center justify-center min-w-0 flex-1 py-2 px-1 rounded-xl transition-colors relative',
+                isActive ? 'text-white' : 'text-slate-500'
               )}
             >
-              <div className="mb-1">
-                <item.icon className="w-5 h-5" />
+              <div className={cn(
+                'mb-1',
+                isActive && 'gradient-text'
+              )}>
+                <item.icon className={cn(
+                  'w-5 h-5',
+                  isActive && 'stroke-[#B6509E]'
+                )} />
               </div>
               <span className={cn(
                 'text-xs font-medium truncate',
-                isActive ? 'text-green-500' : 'text-slate-400'
+                isActive ? 'gradient-text' : 'text-slate-500'
               )}>
                 {item.label}
               </span>
+              {isActive && (
+                <motion.div
+                  layoutId="activeTab"
+                  className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full gradient-bg"
+                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                />
+              )}
             </Link>
           );
         })}

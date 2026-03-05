@@ -1,23 +1,23 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Link from 'next/link';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
+import { AuthGate } from '@/components/AuthGate';
 
-export default function SettingsPage() {
+function SettingsContent() {
   const { user, logout, exportWallet } = usePrivy();
   const { wallets } = useWallets();
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
-  
-  // Get embedded wallet address
+  const [copied, setCopied] = useState(false);
+
   const embeddedWallet = wallets.find(w => w.walletClientType === 'privy');
   const address = embeddedWallet?.address as `0x${string}` | undefined;
 
   const handleExportPrivateKey = async () => {
     if (!embeddedWallet) return;
-    
+
     setIsExporting(true);
     try {
       await exportWallet();
@@ -31,13 +31,12 @@ export default function SettingsPage() {
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      // Could add a toast notification here
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     } catch (error) {
       console.error('Failed to copy:', error);
     }
   };
-
-
 
   return (
     <motion.div
@@ -47,8 +46,8 @@ export default function SettingsPage() {
     >
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-2xl font-bold text-slate-800">Settings</h1>
-        <p className="text-slate-500">Manage your account and preferences</p>
+        <h1 className="text-2xl font-bold text-white">Settings</h1>
+        <p className="text-slate-400">Manage your account and preferences</p>
       </div>
 
       {/* Profile Section */}
@@ -56,24 +55,83 @@ export default function SettingsPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="space-y-4"
+        className="space-y-3"
       >
-        <h2 className="text-lg font-semibold text-slate-800">Profile</h2>
-        
-        <div className="p-4 bg-white rounded-2xl shadow-sm">
+        <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wider">Account</h2>
+
+        <div className="p-4 bg-[#1C2333] border border-white/10 rounded-2xl">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-green-500/10 rounded-full flex items-center justify-center">
-              <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white font-semibold">
+            <div className="w-12 h-12 rounded-full flex items-center justify-center gradient-bg">
+              <span className="text-white font-semibold text-lg">
                 {user?.email?.address?.[0]?.toUpperCase() || 'U'}
-              </div>
+              </span>
             </div>
             <div>
-              <p className="font-medium text-slate-800">
+              <p className="font-medium text-white">
                 {user?.email?.address || 'Anonymous User'}
               </p>
-              <p className="text-sm text-slate-400">
-                {user?.email?.address || 'No email connected'}
+              <p className="text-sm text-slate-500">
+                Signed in via email
               </p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Wallet Info Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+        className="space-y-3"
+      >
+        <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wider">Wallet</h2>
+
+        <div className="p-4 bg-[#1C2333] border border-white/10 rounded-2xl space-y-4">
+          <div className="flex items-start space-x-3">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center gradient-bg flex-shrink-0 mt-0.5">
+              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-slate-300 mb-3">
+                Your wallet is an embedded wallet created by Privy, secured with your email login. Only you control it.
+              </p>
+
+              {/* Address */}
+              <div className="p-3 bg-white/5 rounded-xl border border-white/5">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs text-slate-500">Address</span>
+                  <button
+                    onClick={() => address && copyToClipboard(address)}
+                    className="text-xs gradient-text hover:opacity-80 transition-opacity"
+                  >
+                    {copied ? 'Copied!' : 'Copy'}
+                  </button>
+                </div>
+                <p className="text-xs font-mono text-slate-400 break-all">
+                  {address || 'Not available'}
+                </p>
+              </div>
+
+              {/* Network + Explorer */}
+              <div className="flex items-center justify-between mt-3">
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-green-400 rounded-full" />
+                  <span className="text-xs text-slate-500">Base (Chain ID: 8453)</span>
+                </div>
+                {address && (
+                  <a
+                    href={`https://basescan.org/address/${address}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs gradient-text hover:opacity-80 underline"
+                  >
+                    View on BaseScan
+                  </a>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -84,20 +142,20 @@ export default function SettingsPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="space-y-4"
+        className="space-y-3"
       >
-        <h2 className="text-lg font-semibold text-slate-800">About</h2>
-        
-        <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200">
+        <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wider">About</h2>
+
+        <div className="p-4 bg-[#1C2333] border border-white/10 rounded-2xl">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
-              <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center gradient-bg-subtle">
+              <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <div>
-              <p className="font-medium text-slate-800">App Version</p>
-              <p className="text-sm text-slate-400">Stash v1.0.0</p>
+              <p className="font-medium text-white">Stash</p>
+              <p className="text-sm text-slate-500">v1.0.0</p>
             </div>
           </div>
         </div>
@@ -108,23 +166,23 @@ export default function SettingsPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="space-y-4"
+        className="space-y-3"
       >
         <button
           onClick={() => setShowAdvanced(!showAdvanced)}
-          className="w-full p-4 bg-slate-50 rounded-2xl border border-slate-200 text-left hover:bg-slate-100 transition-colors"
+          className="w-full p-4 bg-[#1C2333] border border-white/10 rounded-2xl text-left hover:border-white/20 transition-all"
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center">
-                <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-8 h-8 bg-white/5 rounded-full flex items-center justify-center">
+                <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z" />
                 </svg>
               </div>
               <div>
-                <h3 className="font-medium text-slate-800">Advanced</h3>
-                <p className="text-sm text-slate-400">Wallet & technical details</p>
+                <h3 className="font-medium text-white">Advanced</h3>
+                <p className="text-sm text-slate-500">Export keys & technical details</p>
               </div>
             </div>
             <motion.div
@@ -148,47 +206,25 @@ export default function SettingsPage() {
               transition={{ duration: 0.3 }}
               className="space-y-3 overflow-hidden"
             >
-              {/* Wallet Address */}
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-slate-700">Wallet Address</span>
-                  <button
-                    onClick={() => address && copyToClipboard(address)}
-                    className="text-xs text-green-500 hover:text-green-400 transition-colors"
-                  >
-                    Copy
-                  </button>
-                </div>
-                <p className="text-xs font-mono text-slate-400 break-all">
-                  {address || 'Not available'}
-                </p>
-              </div>
-
-              {/* Network */}
-              <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
-                <p className="text-sm font-medium text-slate-700 mb-1">Network</p>
-                <p className="text-xs text-slate-400">Base (Chain ID: 8453)</p>
-              </div>
-
               {/* Export Private Key */}
               <motion.button
                 whileTap={{ scale: 0.98 }}
                 onClick={handleExportPrivateKey}
                 disabled={isExporting || !embeddedWallet}
-                className="w-full p-4 bg-orange-50 border border-orange-200 rounded-xl text-left hover:bg-orange-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl text-left hover:bg-amber-500/15 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-orange-500/20 rounded-full flex items-center justify-center">
-                    <svg className="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-8 h-8 bg-amber-500/20 rounded-full flex items-center justify-center">
+                    <svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1 1 21.75 8.25Z" />
                     </svg>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-orange-500">
+                    <p className="text-sm font-medium text-amber-400">
                       {isExporting ? 'Exporting...' : 'Export Private Key'}
                     </p>
-                    <p className="text-xs text-slate-400">
-                      For advanced users only - keep secure
+                    <p className="text-xs text-slate-500">
+                      For advanced users only &mdash; keep secure
                     </p>
                   </div>
                 </div>
@@ -203,12 +239,11 @@ export default function SettingsPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="space-y-4"
       >
         <motion.button
           whileTap={{ scale: 0.98 }}
           onClick={logout}
-          className="w-full p-4 bg-orange-50 border border-orange-200 rounded-xl text-orange-500 hover:bg-orange-100 transition-colors"
+          className="w-full p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 hover:bg-red-500/15 transition-colors"
         >
           <div className="flex items-center justify-center space-x-2">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -222,5 +257,13 @@ export default function SettingsPage() {
       {/* Bottom spacing for nav */}
       <div className="pb-20" />
     </motion.div>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <AuthGate>
+      <SettingsContent />
+    </AuthGate>
   );
 }

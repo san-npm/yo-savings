@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useYoClient } from '@/lib/useYoClient';
 import { getAllAccounts } from '@/lib/accounts';
+import { AuthGate } from '@/components/AuthGate';
 
 interface Transaction {
   id: string;
@@ -20,20 +21,20 @@ const formatDate = (timestamp: number) => {
   const date = new Date(timestamp * 1000);
   const now = new Date();
   const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-  
+
   if (diffInHours < 1) return 'Just now';
   if (diffInHours < 24) return `${diffInHours}h ago`;
   if (diffInHours < 48) return '1 day ago';
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 };
 
-export default function ActivityPage() {
+function ActivityContent() {
   const [filter, setFilter] = useState<'all' | 'deposit' | 'withdraw'>('all');
   const [accountFilter, setAccountFilter] = useState<string>('all');
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   const { client, address } = useYoClient();
   const allAccounts = getAllAccounts();
 
@@ -46,13 +47,12 @@ export default function ActivityPage() {
         setError(null);
         const allTransactions: Transaction[] = [];
 
-        // Fetch history from both vaults
         for (const account of allAccounts) {
           try {
             const history = await client.getUserHistory(
               account.vaultAddress as `0x${string}`,
               address,
-              50 // Limit to last 50 transactions per vault
+              50
             );
 
             const accountTransactions = history.map((tx) => ({
@@ -69,13 +69,10 @@ export default function ActivityPage() {
             allTransactions.push(...accountTransactions);
           } catch (vaultError) {
             console.error(`Error fetching history for ${account.displayName}:`, vaultError);
-            // Continue with other vaults even if one fails
           }
         }
 
-        // Sort by timestamp descending (newest first)
         allTransactions.sort((a, b) => Number(b.date) - Number(a.date));
-        
         setTransactions(allTransactions);
       } catch (error) {
         console.error('Error fetching transactions:', error);
@@ -94,14 +91,6 @@ export default function ActivityPage() {
     return true;
   });
 
-  if (!address) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-slate-500">Please sign in to view your activity</p>
-      </div>
-    );
-  }
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -110,12 +99,12 @@ export default function ActivityPage() {
     >
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-2xl font-bold text-slate-800">Activity</h1>
-        <p className="text-slate-500">Your transaction history</p>
+        <h1 className="text-2xl font-bold text-white">Activity</h1>
+        <p className="text-slate-400">Your transaction history</p>
       </div>
 
       {/* Filters */}
-      <div className="space-y-4">
+      <div className="space-y-3">
         {/* Transaction Type Filter */}
         <div className="flex space-x-2">
           {[
@@ -126,10 +115,10 @@ export default function ActivityPage() {
             <button
               key={item.key}
               onClick={() => setFilter(item.key as any)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                 filter === item.key
-                  ? 'bg-green-500 text-white'
-                  : 'bg-slate-100 text-slate-600 hover:text-slate-700'
+                  ? 'gradient-bg text-white shadow-lg'
+                  : 'bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10 hover:text-white'
               }`}
             >
               {item.label}
@@ -147,10 +136,10 @@ export default function ActivityPage() {
             <button
               key={item.key}
               onClick={() => setAccountFilter(item.key)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
                 accountFilter === item.key
-                  ? 'bg-white border border-slate-300 shadow-sm text-slate-800'
-                  : 'bg-slate-100 text-slate-600 hover:text-slate-700'
+                  ? 'bg-white/10 border border-white/20 text-white'
+                  : 'bg-white/5 text-slate-500 border border-white/5 hover:bg-white/8 hover:text-slate-300'
               }`}
             >
               {item.label}
@@ -161,8 +150,8 @@ export default function ActivityPage() {
 
       {/* Error State */}
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
-          <p className="text-sm text-red-600">{error}</p>
+        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
+          <p className="text-sm text-red-400">{error}</p>
         </div>
       )}
 
@@ -170,16 +159,16 @@ export default function ActivityPage() {
       {isLoading && (
         <div className="space-y-3">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="p-4 bg-white rounded-2xl shadow-sm animate-pulse">
+            <div key={i} className="p-4 bg-[#1C2333] border border-white/10 rounded-2xl">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                  <div className="w-10 h-10 bg-slate-200 rounded-full" />
+                  <div className="w-10 h-10 rounded-full loading-pulse" />
                   <div className="space-y-2">
-                    <div className="w-20 h-4 bg-slate-200 rounded" />
-                    <div className="w-32 h-3 bg-slate-200 rounded" />
+                    <div className="w-20 h-4 rounded loading-pulse" />
+                    <div className="w-32 h-3 rounded loading-pulse" />
                   </div>
                 </div>
-                <div className="w-16 h-6 bg-slate-200 rounded" />
+                <div className="w-16 h-6 rounded loading-pulse" />
               </div>
             </div>
           ))}
@@ -195,12 +184,12 @@ export default function ActivityPage() {
               animate={{ opacity: 1 }}
               className="text-center py-12"
             >
-              <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4 mx-auto">
+              <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4 mx-auto">
                 <svg className="w-8 h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
-              <h3 className="text-lg font-medium text-slate-700 mb-2">No transactions found</h3>
+              <h3 className="text-lg font-medium text-white mb-2">No transactions found</h3>
               <p className="text-slate-500">
                 {transactions.length === 0 ? 'Make your first deposit to see activity here' : 'Try adjusting your filters'}
               </p>
@@ -212,55 +201,55 @@ export default function ActivityPage() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="p-4 bg-white rounded-2xl shadow-sm hover:shadow-md transition-all"
+                className="p-4 bg-[#1C2333] border border-white/10 rounded-2xl hover:border-white/20 transition-all"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      transaction.type === 'deposit' 
-                        ? 'bg-green-100 text-green-500' 
-                        : 'bg-slate-100 text-slate-500'
+                      transaction.type === 'deposit'
+                        ? 'bg-green-500/15 text-green-400'
+                        : 'bg-amber-500/15 text-amber-400'
                     }`}>
                       {transaction.type === 'deposit' ? (
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m0 0l-4-4m4 4l4-4" />
                         </svg>
                       ) : (
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 20V4m0 0l4 4m-4-4l-4 4" />
                         </svg>
                       )}
                     </div>
-                    
+
                     <div className="space-y-1">
                       <div className="flex items-center space-x-2">
-                        <h3 className="font-medium text-slate-800">
+                        <h3 className="font-medium text-white">
                           {transaction.type === 'deposit' ? 'Deposit' : 'Withdrawal'}
                         </h3>
-                        <span className="text-xs px-2 py-0.5 rounded-full text-green-500">
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20">
                           completed
                         </span>
                       </div>
                       <div className="flex items-center space-x-2 text-sm text-slate-500">
                         <span>{transaction.account}</span>
-                        <span>•</span>
+                        <span>&bull;</span>
                         <span>{formatDate(transaction.date)}</span>
-                        <span>•</span>
+                        <span>&bull;</span>
                         <a
                           href={`https://basescan.org/tx/${transaction.hash}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="font-mono text-green-600 hover:text-green-700 underline"
+                          className="font-mono gradient-text hover:opacity-80 underline"
                         >
                           {transaction.hash.slice(0, 6)}...{transaction.hash.slice(-4)}
                         </a>
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="text-right">
-                    <div className={`font-semibold text-lg ${
-                      transaction.type === 'deposit' ? 'text-green-500' : 'text-slate-800'
+                    <div className={`font-semibold text-lg tabular-nums ${
+                      transaction.type === 'deposit' ? 'text-green-400' : 'text-amber-400'
                     }`}>
                       {transaction.type === 'deposit' ? '+' : '-'}${transaction.amount.toLocaleString()}
                     </div>
@@ -275,5 +264,13 @@ export default function ActivityPage() {
       {/* Bottom spacing for nav */}
       <div className="pb-20" />
     </motion.div>
+  );
+}
+
+export default function ActivityPage() {
+  return (
+    <AuthGate>
+      <ActivityContent />
+    </AuthGate>
   );
 }

@@ -13,7 +13,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 1000 * 60 * 2, // 2 minutes
+            staleTime: 1000 * 60 * 2,
             refetchOnWindowFocus: false,
           },
         },
@@ -26,8 +26,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
       config={{
         loginMethods: ['email'],
         appearance: {
-          theme: 'light',
-          accentColor: '#22C55E',
+          theme: 'dark',
+          accentColor: '#B6509E',
           logo: undefined,
         },
         embeddedWallets: {

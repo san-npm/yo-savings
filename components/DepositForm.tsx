@@ -19,8 +19,6 @@ interface DepositFormProps {
 const quickAmounts = [50, 100, 500, 1000];
 const MIN_DEPOSIT = 1;
 
-
-// Map blockchain errors to user-friendly messages
 function friendlyError(error: any): string {
   const msg = error?.message || error?.toString() || '';
   if (msg.includes('User rejected') || msg.includes('user rejected') || msg.includes('ACTION_REJECTED'))
@@ -54,7 +52,6 @@ export function DepositForm({
     const cleaned = value.replace(/[^0-9.]/g, '');
     const parts = cleaned.split('.');
     if (parts.length > 2) return;
-    // Limit to 2 decimal places
     if (parts[1] && parts[1].length > 2) return;
     setAmount(cleaned);
     setError(null);
@@ -74,7 +71,6 @@ export function DepositForm({
       setError(`Minimum deposit is ${account.currencySymbol}${MIN_DEPOSIT}`);
       return;
     }
-    // Show confirmation dialog
     haptics.confirm();
     setShowConfirm(true);
   };
@@ -113,25 +109,20 @@ export function DepositForm({
         animate={{ opacity: 1, scale: 1 }}
         className="flex flex-col items-center justify-center py-16 space-y-6"
       >
-        <Confetti
-          active={showSuccess}
-          onComplete={() => {}}
-        />
+        <Confetti active={showSuccess} onComplete={() => {}} />
 
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-          className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center"
+          className="w-16 h-16 rounded-full flex items-center justify-center gradient-bg"
         >
-          <span className="text-2xl">&#10003;</span>
+          <span className="text-2xl text-white">&#10003;</span>
         </motion.div>
 
         <div className="text-center space-y-2">
-          <h2 className="text-xl font-semibold text-slate-800 mb-2">
-            Done!
-          </h2>
-          <p className="text-slate-600">
+          <h2 className="text-xl font-semibold text-white mb-2">Done!</h2>
+          <p className="text-slate-400">
             {account.currencySymbol}{successAmount} added to {account.displayName}
           </p>
           {localTxHash && (
@@ -139,7 +130,7 @@ export function DepositForm({
               href={`https://basescan.org/tx/${localTxHash}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-green-600 hover:text-green-700 underline"
+              className="text-xs gradient-text hover:opacity-80 underline"
             >
               View transaction
             </a>
@@ -148,11 +139,8 @@ export function DepositForm({
 
         <motion.button
           whileTap={{ scale: 0.95 }}
-          onClick={() => {
-            setShowSuccess(false);
-            onReset?.();
-          }}
-          className="px-6 py-3 bg-green-500 text-white font-medium rounded-xl hover:bg-green-600 transition-colors"
+          onClick={() => { setShowSuccess(false); onReset?.(); }}
+          className="px-6 py-3 text-white font-medium rounded-xl gradient-bg hover:opacity-90 transition-opacity"
         >
           Done
         </motion.button>
@@ -169,7 +157,7 @@ export function DepositForm({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end justify-center p-4"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end justify-center p-4"
             onClick={() => setShowConfirm(false)}
           >
             <motion.div
@@ -177,33 +165,33 @@ export function DepositForm({
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 100, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md bg-white rounded-2xl p-6 space-y-5 shadow-xl"
+              className="w-full max-w-md bg-[#1C2333] border border-white/10 rounded-2xl p-6 space-y-5 shadow-xl"
             >
-              <h3 className="text-lg font-semibold text-slate-800 text-center">Confirm Deposit</h3>
+              <h3 className="text-lg font-semibold text-white text-center">Confirm Deposit</h3>
 
-              <div className="p-4 bg-slate-50 rounded-xl space-y-3">
+              <div className="p-4 bg-white/5 rounded-xl space-y-3 border border-white/5">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-500">Amount</span>
-                  <span className="text-lg font-semibold text-slate-800">
+                  <span className="text-sm text-slate-400">Amount</span>
+                  <span className="text-lg font-semibold text-white">
                     {account.currencySymbol}{parsedAmount.toFixed(2)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-500">Account</span>
-                  <span className="text-sm font-medium text-slate-700">{account.displayName}</span>
+                  <span className="text-sm text-slate-400">Account</span>
+                  <span className="text-sm font-medium text-slate-300">{account.displayName}</span>
                 </div>
               </div>
 
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowConfirm(false)}
-                  className="flex-1 h-12 rounded-xl font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
+                  className="flex-1 h-12 rounded-xl font-medium bg-white/10 text-slate-300 hover:bg-white/15 transition-colors border border-white/10"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleConfirmDeposit}
-                  className="flex-1 h-12 rounded-xl font-medium bg-green-500 text-white hover:bg-green-600 transition-colors"
+                  className="flex-1 h-12 rounded-xl font-medium text-white gradient-bg hover:opacity-90 transition-opacity"
                 >
                   Confirm
                 </button>
@@ -220,19 +208,17 @@ export function DepositForm({
         className="space-y-8"
       >
         {/* Account Header */}
-        <div className="flex items-center space-x-3 p-4 bg-white rounded-2xl shadow-sm">
+        <div className="flex items-center space-x-3 p-4 bg-[#1C2333] border border-white/10 rounded-2xl">
           <CurrencyIcon accountId={account.id} />
           <div>
-            <h2 className="font-medium text-slate-800">{account.displayName}</h2>
-            <p className="text-sm text-slate-500">Add money to start earning</p>
+            <h2 className="font-medium text-white">{account.displayName}</h2>
+            <p className="text-sm text-slate-400">Add money to start earning</p>
           </div>
         </div>
 
         {/* Amount Input */}
         <div className="space-y-4">
-          <label className="block text-sm font-medium text-slate-600">
-            Amount
-          </label>
+          <label className="block text-sm font-medium text-slate-400">Amount</label>
 
           <div className="relative">
             <input
@@ -241,7 +227,7 @@ export function DepositForm({
               value={amount}
               onChange={(e) => handleAmountChange(e.target.value)}
               placeholder="0.00"
-              className="w-full text-4xl font-semibold text-center bg-transparent text-slate-800 placeholder-slate-400 border-none outline-none tabular-nums"
+              className="w-full text-4xl font-semibold text-center bg-transparent text-white placeholder-slate-600 border-none outline-none tabular-nums"
               autoFocus
               disabled={busy}
             />
@@ -250,7 +236,7 @@ export function DepositForm({
             </div>
           </div>
 
-          {/* Quick Amounts */}
+          {/* Quick Amounts — glass pills */}
           <div className="flex flex-wrap gap-2 justify-center">
             {quickAmounts.map((quickAmount) => (
               <motion.button
@@ -259,7 +245,7 @@ export function DepositForm({
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleQuickAmount(quickAmount)}
                 disabled={busy}
-                className="py-1.5 px-4 text-sm font-medium text-slate-600 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors disabled:opacity-50"
+                className="py-1.5 px-4 text-sm font-medium text-slate-300 bg-white/8 border border-white/10 rounded-full hover:bg-white/12 hover:border-white/20 transition-all disabled:opacity-50"
               >
                 {account.currencySymbol}{quickAmount}
               </motion.button>
@@ -269,22 +255,22 @@ export function DepositForm({
 
         {/* Error Display */}
         {error && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-xl">
-            <p className="text-sm text-red-600">{error}</p>
+          <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
+            <p className="text-sm text-red-400">{error}</p>
           </div>
         )}
 
-
-        {/* Deposit Button — disabled during processing */}
+        {/* Deposit Button */}
         <motion.button
           type="submit"
           disabled={!isValid || busy || isLoading}
           whileTap={{ scale: isValid && !busy ? 0.95 : 1 }}
           className={`w-full h-12 rounded-xl font-medium transition-all ${
             isValid && !busy
-              ? 'bg-green-500 text-white hover:bg-green-600'
-              : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+              ? 'text-white gradient-bg hover:opacity-90 shadow-lg'
+              : 'bg-white/5 text-slate-500 cursor-not-allowed border border-white/5'
           }`}
+          style={isValid && !busy ? { boxShadow: '0 0 20px rgba(182, 80, 158, 0.2)' } : {}}
         >
           {busy ? (
             <div className="flex items-center justify-center space-x-2">

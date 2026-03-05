@@ -74,7 +74,7 @@ export default function AccountDetailPage() {
   if (!account) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-slate-400">Account not found</p>
+        <p className="text-slate-500">Account not found</p>
       </div>
     );
   }
@@ -91,69 +91,69 @@ export default function AccountDetailPage() {
     >
       {/* Header */}
       <div className="flex items-center justify-between">
-        <Link
-          href="/"
-          className="p-2 hover:bg-slate-100 rounded-xl transition-colors"
-        >
-          <svg className="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <Link href="/" className="p-2 hover:bg-white/5 rounded-xl transition-colors">
+          <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </Link>
-        <h1 className="text-lg font-medium text-slate-800">Account Details</h1>
+        <h1 className="text-lg font-medium text-white">Account Details</h1>
         <div className="w-8" />
       </div>
 
-      {/* Account Info Card */}
+      {/* Account Info Card — gradient header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="p-6 bg-white backdrop-blur-sm rounded-2xl shadow-sm"
+        className="overflow-hidden rounded-2xl"
       >
-        <div className="flex items-center space-x-4 mb-6">
-          <CurrencyIcon accountId={account.id} size="lg" />
-          <div>
-            <h2 className="text-xl font-semibold text-slate-800">
-              {account.displayName}
-            </h2>
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-green-500 font-medium">
-                {formatPercentage(annualRate)} annual rate
-              </span>
-              <div className="w-1 h-1 bg-slate-300 rounded-full" />
-              <span className="text-sm text-slate-400">Earning daily</span>
+        <div className="p-6 gradient-bg relative">
+          <div className="absolute inset-0 bg-white/5" />
+          <div className="relative z-10 flex items-center space-x-4 mb-6">
+            <CurrencyIcon accountId={account.id} size="lg" />
+            <div>
+              <h2 className="text-xl font-semibold text-white">{account.displayName}</h2>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-white/80 font-medium">
+                  {formatPercentage(annualRate)} annual rate
+                </span>
+                <div className="w-1 h-1 bg-white/40 rounded-full" />
+                <span className="text-sm text-white/60">Earning daily</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative z-10 space-y-2 mb-6">
+            <p className="text-sm text-white/60">Current Balance</p>
+            <div className="text-4xl font-semibold text-white tabular-nums">
+              {isLoading ? (
+                <div className="w-32 h-10 bg-white/10 rounded loading-pulse" />
+              ) : (
+                formatBalance(balance, accountId)
+              )}
             </div>
           </div>
         </div>
 
-        <div className="space-y-2 mb-6">
-          <p className="text-sm text-slate-500">Current Balance</p>
-          <div className="text-4xl font-semibold text-slate-800 tabular-nums">
-            {isLoading ? (
-              <div className="w-32 h-10 bg-slate-200 rounded animate-pulse" />
-            ) : (
-              formatBalance(balance, accountId)
-            )}
+        <div className="p-4 bg-[#1C2333] border-x border-b border-white/10 rounded-b-2xl">
+          <div className="grid grid-cols-2 gap-3">
+            <Link href={`/deposit?account=${accountId}`}>
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                className="w-full btn-primary"
+              >
+                Deposit
+              </motion.button>
+            </Link>
+            <Link href={`/withdraw?account=${accountId}`}>
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                className="w-full btn-secondary"
+              >
+                Withdraw
+              </motion.button>
+            </Link>
           </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <Link href={`/deposit?account=${accountId}`}>
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              className="w-full btn-primary"
-            >
-              Deposit
-            </motion.button>
-          </Link>
-          <Link href={`/withdraw?account=${accountId}`}>
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              className="w-full btn-secondary"
-            >
-              Withdraw
-            </motion.button>
-          </Link>
         </div>
       </motion.div>
 
@@ -162,7 +162,7 @@ export default function AccountDetailPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="p-6 bg-white rounded-2xl shadow-sm"
+        className="p-6 bg-[#1C2333] border border-white/10 rounded-2xl"
       >
         <EarningsChart
           data={(yieldHistory || []).map((point: { timestamp: number; value: number }, i: number) => ({
@@ -182,31 +182,31 @@ export default function AccountDetailPage() {
         transition={{ delay: 0.3 }}
         className="space-y-4"
       >
-        <h3 className="text-lg font-medium text-slate-800">Recent Activity</h3>
+        <h3 className="text-lg font-medium text-white">Recent Activity</h3>
 
         <div className="space-y-3">
           {transactionsLoading ? (
             [...Array(3)].map((_, i) => (
-              <div key={i} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100 animate-pulse">
+              <div key={i} className="flex items-center justify-between p-4 bg-[#1C2333] border border-white/10 rounded-xl">
                 <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-slate-200 rounded-full" />
+                  <div className="w-8 h-8 rounded-full loading-pulse" />
                   <div className="space-y-1">
-                    <div className="w-16 h-4 bg-slate-200 rounded" />
-                    <div className="w-24 h-3 bg-slate-200 rounded" />
+                    <div className="w-16 h-4 rounded loading-pulse" />
+                    <div className="w-24 h-3 rounded loading-pulse" />
                   </div>
                 </div>
-                <div className="w-16 h-4 bg-slate-200 rounded" />
+                <div className="w-16 h-4 rounded loading-pulse" />
               </div>
             ))
           ) : transactions.length === 0 ? (
-            <div className="p-8 text-center bg-slate-50 rounded-2xl border border-slate-100">
-              <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mb-2 mx-auto">
+            <div className="p-8 text-center bg-[#1C2333] border border-white/10 rounded-2xl">
+              <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mb-2 mx-auto">
                 <svg className="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <p className="text-sm text-slate-500">No transactions yet</p>
-              <p className="text-xs text-slate-400">Your activity will appear here</p>
+              <p className="text-sm text-slate-400">No transactions yet</p>
+              <p className="text-xs text-slate-500">Your activity will appear here</p>
             </div>
           ) : (
             transactions.map((tx, index) => (
@@ -215,13 +215,13 @@ export default function AccountDetailPage() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.4 + index * 0.1 }}
-                className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100"
+                className="flex items-center justify-between p-4 bg-[#1C2333] border border-white/10 rounded-xl"
               >
                 <div className="flex items-center space-x-3">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                     tx.type === 'deposit'
-                      ? 'bg-green-100 text-green-500'
-                      : 'bg-slate-100 text-slate-500'
+                      ? 'bg-green-500/15 text-green-400'
+                      : 'bg-white/5 text-slate-400'
                   }`}>
                     {tx.type === 'deposit' ? (
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -234,9 +234,7 @@ export default function AccountDetailPage() {
                     )}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-slate-800 capitalize">
-                      {tx.type}
-                    </p>
+                    <p className="text-sm font-medium text-white capitalize">{tx.type}</p>
                     <p className="text-xs text-slate-500">
                       {new Date(tx.timestamp * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                     </p>
@@ -245,13 +243,11 @@ export default function AccountDetailPage() {
 
                 <div className="text-right">
                   <div className={`text-sm font-semibold tabular-nums ${
-                    tx.type === 'deposit' ? 'text-green-500' : 'text-slate-500'
+                    tx.type === 'deposit' ? 'text-green-400' : 'text-slate-300'
                   }`}>
                     {tx.type === 'deposit' ? '+' : '-'}{formatBalance(tx.amount, accountId)}
                   </div>
-                  <div className="text-xs text-slate-500 capitalize">
-                    {tx.status}
-                  </div>
+                  <div className="text-xs text-slate-500 capitalize">{tx.status}</div>
                 </div>
               </motion.div>
             ))
@@ -264,17 +260,17 @@ export default function AccountDetailPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="p-4 bg-slate-50 rounded-xl border border-slate-200"
+        className="p-4 bg-white/5 rounded-xl border border-white/10"
       >
         <div className="flex items-center space-x-2 mb-2">
-          <div className="w-5 h-5 bg-green-500/20 rounded-full flex items-center justify-center">
-            <svg className="w-3 h-3 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-5 h-5 rounded-full flex items-center justify-center gradient-bg">
+            <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
           </div>
-          <span className="text-sm font-medium text-slate-700">Secured by audited protocols</span>
+          <span className="text-sm font-medium text-white">Secured by audited protocols</span>
         </div>
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-slate-500">
           Your funds are always yours. Withdraw anytime with no fees.
         </p>
       </motion.div>

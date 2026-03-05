@@ -10,19 +10,33 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Light Theme Design System Colors
-        background: '#F8FAFC', // slate-50, very light gray
-        card: '#FFFFFF', // pure white
-        border: '#E2E8F0', // slate-200, subtle borders
-        'border-hover': '#CBD5E1', // slate-300, hover borders
-        primary: '#22C55E', // green-500, primary actions
-        'primary-hover': '#16A34A', // green-600, hover state
-        secondary: '#6366F1', // indigo-500, secondary actions
-        success: '#22C55E', // green-500, for money/earnings
-        error: '#EF4444', // red-500
-        'text-primary': '#1E293B', // slate-800, main text
-        'text-secondary': '#64748B', // slate-500, secondary text
-        'text-muted': '#94A3B8', // slate-400, muted text
+        // Dark Theme Design System
+        background: '#0E1117',
+        'background-secondary': '#161B22',
+        surface: '#1C2333',
+        'surface-elevated': '#21273A',
+        card: '#1C2333',
+        border: 'rgba(255, 255, 255, 0.1)',
+        'border-hover': 'rgba(255, 255, 255, 0.2)',
+
+        // Accent gradient endpoints
+        accent: {
+          purple: '#B6509E',
+          teal: '#2EBAC6',
+        },
+
+        // Semantic colors
+        primary: '#B6509E',
+        'primary-hover': '#C76AB2',
+        secondary: '#2EBAC6',
+        success: '#22C55E',
+        error: '#EF4444',
+        warning: '#F59E0B',
+
+        // Text
+        'text-primary': '#F1F5F9',
+        'text-secondary': '#94A3B8',
+        'text-muted': '#64748B',
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
@@ -49,6 +63,8 @@ const config: Config = {
         'fade-in': 'fadeIn 0.5s ease-out',
         'slide-up': 'slideUp 0.5s ease-out',
         'scale-in': 'scaleIn 0.3s ease-out',
+        'shimmer': 'shimmer 2s linear infinite',
+        'glow-pulse': 'glowPulse 2s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -73,14 +89,18 @@ const config: Config = {
             'animation-timing-function': 'cubic-bezier(0, 0, 0.2, 1)',
           },
         },
-      },
-      fontFeatureSettings: {
-        'numeric': ['tnum', 'lnum'],
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
+        glowPulse: {
+          '0%, 100%': { opacity: '0.5' },
+          '50%': { opacity: '1' },
+        },
       },
     },
   },
   plugins: [
-    // Add tabular numbers utility
     function({ addUtilities }: any) {
       addUtilities({
         '.tabular-nums': {

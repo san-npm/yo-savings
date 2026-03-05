@@ -20,7 +20,6 @@ interface WithdrawFormProps {
 
 const MIN_WITHDRAW = 0.01;
 
-
 function friendlyError(error: any): string {
   const msg = error?.message || error?.toString() || '';
   if (msg.includes('User rejected') || msg.includes('user rejected') || msg.includes('ACTION_REJECTED'))
@@ -133,20 +132,20 @@ export function WithdrawForm({
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-          className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center"
+          className="w-16 h-16 rounded-full flex items-center justify-center gradient-bg"
         >
-          <span className="text-2xl">&#10003;</span>
+          <span className="text-2xl text-white">&#10003;</span>
         </motion.div>
 
         <div className="text-center space-y-2">
-          <h2 className="text-xl font-semibold text-slate-800 mb-2">
+          <h2 className="text-xl font-semibold text-white mb-2">
             {queuedStatus ? 'Queued for Processing' : 'Done!'}
           </h2>
-          <p className="text-slate-600">
+          <p className="text-slate-400">
             {account.currencySymbol}{successAmount.toFixed(2)} {queuedStatus ? 'queued for withdrawal' : 'withdrawn to your account'}
           </p>
           {queuedStatus && (
-            <p className="text-sm text-orange-600">
+            <p className="text-sm text-amber-400">
               Your withdrawal may take some time to process during high demand
             </p>
           )}
@@ -155,7 +154,7 @@ export function WithdrawForm({
               href={`https://basescan.org/tx/${localTxHash}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-green-600 hover:text-green-700 underline"
+              className="text-xs gradient-text hover:opacity-80 underline"
             >
               View transaction
             </a>
@@ -164,11 +163,8 @@ export function WithdrawForm({
 
         <motion.button
           whileTap={{ scale: 0.95 }}
-          onClick={() => {
-            setShowSuccess(false);
-            onReset?.();
-          }}
-          className="px-6 py-3 bg-green-500 text-white font-medium rounded-xl hover:bg-green-600 transition-colors"
+          onClick={() => { setShowSuccess(false); onReset?.(); }}
+          className="px-6 py-3 text-white font-medium rounded-xl gradient-bg hover:opacity-90 transition-opacity"
         >
           Done
         </motion.button>
@@ -185,7 +181,7 @@ export function WithdrawForm({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end justify-center p-4"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end justify-center p-4"
             onClick={() => setShowConfirm(false)}
           >
             <motion.div
@@ -193,43 +189,43 @@ export function WithdrawForm({
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 100, opacity: 0 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-md bg-white rounded-2xl p-6 space-y-5 shadow-xl"
+              className="w-full max-w-md bg-[#1C2333] border border-white/10 rounded-2xl p-6 space-y-5 shadow-xl"
             >
-              <h3 className="text-lg font-semibold text-slate-800 text-center">Confirm Withdrawal</h3>
+              <h3 className="text-lg font-semibold text-white text-center">Confirm Withdrawal</h3>
 
-              <div className="p-4 bg-slate-50 rounded-xl space-y-3">
+              <div className="p-4 bg-white/5 rounded-xl space-y-3 border border-white/5">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-500">Amount</span>
-                  <span className="text-lg font-semibold text-slate-800">
+                  <span className="text-sm text-slate-400">Amount</span>
+                  <span className="text-lg font-semibold text-white">
                     {account.currencySymbol}{parsedAmount.toFixed(2)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-500">From</span>
-                  <span className="text-sm font-medium text-slate-700">{account.displayName}</span>
+                  <span className="text-sm text-slate-400">From</span>
+                  <span className="text-sm font-medium text-slate-300">{account.displayName}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-500">Remaining</span>
-                  <span className="text-sm text-slate-600">
+                  <span className="text-sm text-slate-400">Remaining</span>
+                  <span className="text-sm text-slate-300">
                     {account.currencySymbol}{(availableBalance - parsedAmount).toFixed(2)}
                   </span>
                 </div>
               </div>
 
-              <p className="text-xs text-slate-400 text-center">
+              <p className="text-xs text-slate-500 text-center">
                 Withdrawn funds will stop earning interest immediately.
               </p>
 
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowConfirm(false)}
-                  className="flex-1 h-12 rounded-xl font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
+                  className="flex-1 h-12 rounded-xl font-medium bg-white/10 text-slate-300 hover:bg-white/15 transition-colors border border-white/10"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleConfirmWithdraw}
-                  className="flex-1 h-12 rounded-xl font-medium bg-emerald-500 text-white hover:bg-emerald-600 transition-colors"
+                  className="flex-1 h-12 rounded-xl font-medium text-white gradient-bg hover:opacity-90 transition-opacity"
                 >
                   Confirm
                 </button>
@@ -246,22 +242,22 @@ export function WithdrawForm({
         className="space-y-8"
       >
         {/* Account Header */}
-        <div className="flex items-center justify-between p-4 bg-white rounded-2xl shadow-sm">
+        <div className="flex items-center justify-between p-4 bg-[#1C2333] border border-white/10 rounded-2xl">
           <div className="flex items-center space-x-3">
             <CurrencyIcon accountId={account.id} />
             <div>
-              <h2 className="font-medium text-slate-800">{account.displayName}</h2>
+              <h2 className="font-medium text-white">{account.displayName}</h2>
               <p className="text-sm text-slate-400">Withdraw to your account</p>
             </div>
           </div>
         </div>
 
         {/* Available Balance */}
-        <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
+        <div className="p-4 bg-white/5 rounded-xl border border-white/10">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-slate-500">Available balance</span>
+            <span className="text-sm text-slate-400">Available balance</span>
             <div className="text-right">
-              <div className="font-semibold text-slate-800 tabular-nums">
+              <div className="font-semibold text-white tabular-nums">
                 {formatBalance(availableBalance, account.id)}
               </div>
             </div>
@@ -271,15 +267,13 @@ export function WithdrawForm({
         {/* Amount Input */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <label className="block text-sm font-medium text-slate-500">
-              Amount to withdraw
-            </label>
+            <label className="block text-sm font-medium text-slate-400">Amount to withdraw</label>
             <motion.button
               type="button"
               whileTap={{ scale: 0.95 }}
               onClick={handleMaxAmount}
               disabled={busy}
-              className="text-sm text-green-500 hover:text-green-400 transition-colors disabled:opacity-50"
+              className="text-sm gradient-text hover:opacity-80 transition-opacity disabled:opacity-50"
             >
               Max
             </motion.button>
@@ -293,8 +287,8 @@ export function WithdrawForm({
               onChange={(e) => handleAmountChange(e.target.value)}
               placeholder="0.00"
               disabled={busy}
-              className={`w-full text-4xl font-semibold text-center bg-transparent placeholder-slate-400 border-none outline-none tabular-nums ${
-                isOverLimit ? 'text-red-400' : 'text-slate-800'
+              className={`w-full text-4xl font-semibold text-center bg-transparent placeholder-slate-600 border-none outline-none tabular-nums ${
+                isOverLimit ? 'text-red-400' : 'text-white'
               } disabled:opacity-50`}
               autoFocus
             />
@@ -313,7 +307,7 @@ export function WithdrawForm({
             )}
           </div>
 
-          {/* Quick Percentages */}
+          {/* Quick Percentages — glass pills */}
           <div className="grid grid-cols-4 gap-2">
             {[25, 50, 75, 100].map((percentage) => (
               <motion.button
@@ -322,7 +316,7 @@ export function WithdrawForm({
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleQuickPercentage(percentage)}
                 disabled={busy}
-                className="py-2 px-3 text-sm font-medium text-slate-600 bg-slate-100 rounded-xl hover:bg-slate-200 hover:text-slate-700 transition-colors disabled:opacity-50"
+                className="py-2 px-3 text-sm font-medium text-slate-300 bg-white/8 border border-white/10 rounded-xl hover:bg-white/12 hover:border-white/20 transition-all disabled:opacity-50"
               >
                 {percentage}%
               </motion.button>
@@ -332,21 +326,21 @@ export function WithdrawForm({
 
         {/* Error Display */}
         {error && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-xl">
-            <p className="text-sm text-red-600">{error}</p>
+          <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl">
+            <p className="text-sm text-red-400">{error}</p>
           </div>
         )}
 
         {/* Step indicator */}
         {currentStepLabel && !error && (
-          <div className="p-3 bg-green-50 border border-green-200 rounded-xl">
+          <div className="p-3 bg-accent-purple/10 border border-accent-purple/20 rounded-xl">
             <div className="flex items-center space-x-2">
               <motion.div
-                className="w-4 h-4 border-2 border-green-300 border-t-green-600 rounded-full"
+                className="w-4 h-4 border-2 border-accent-purple/30 border-t-accent-purple rounded-full"
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
               />
-              <p className="text-sm text-green-700">{currentStepLabel}</p>
+              <p className="text-sm text-accent-purple">{currentStepLabel}</p>
             </div>
           </div>
         )}
@@ -358,9 +352,10 @@ export function WithdrawForm({
           whileTap={{ scale: isValid && !busy ? 0.95 : 1 }}
           className={`w-full h-12 rounded-xl font-medium transition-all ${
             isValid && !busy
-              ? 'bg-emerald-400 text-white hover:bg-emerald-500'
-              : 'bg-slate-200 text-slate-500 cursor-not-allowed'
+              ? 'text-white gradient-bg hover:opacity-90 shadow-lg'
+              : 'bg-white/5 text-slate-500 cursor-not-allowed border border-white/5'
           }`}
+          style={isValid && !busy ? { boxShadow: '0 0 20px rgba(46, 186, 198, 0.2)' } : {}}
         >
           {busy ? (
             <div className="flex items-center justify-center space-x-2">

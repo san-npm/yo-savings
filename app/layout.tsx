@@ -6,7 +6,7 @@ import { ClientOnly } from '@/components/ClientOnly';
 import { BottomNav } from '@/components/BottomNav';
 import { Bootstrap } from '@/components/Bootstrap';
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
 });
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
+    statusBarStyle: 'black-translucent',
     title: 'Stash',
   },
   icons: {
@@ -32,7 +32,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-  themeColor: '#F8FAFC',
+  themeColor: '#0E1117',
 };
 
 export default function RootLayout({
@@ -42,7 +42,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable}`}>
-      <body style={{ minHeight: '100vh' }}>
+      <body style={{ minHeight: '100vh' }} className="bg-[#0E1117]">
         <ClientOnly>
           <Providers>
             <Bootstrap />
