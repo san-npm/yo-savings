@@ -61,21 +61,37 @@ interface RecentTransaction {
   status: 'completed';
 }
 
-function FloatingDot({ delay, x, y }: { delay: number; x: string; y: string }) {
+function FloatingParticle({ delay, x, y, shape = 'dot' }: { delay: number; x: string; y: string; shape?: 'dot' | 'coin' | 'spark' }) {
+  if (shape === 'coin') {
+    return (
+      <motion.div
+        className="absolute"
+        style={{ left: x, top: y }}
+        animate={{ y: [0, -10, 0], rotate: [0, 15, 0], opacity: [0.3, 0.7, 0.3] }}
+        transition={{ duration: 5, delay, repeat: Infinity, ease: 'easeInOut' }}
+      >
+        <div className="w-4 h-4 rounded-full border border-[#D6FF34]/50 bg-[#D6FF34]/10 flex items-center justify-center">
+          <span className="text-[7px] text-[#D6FF34]/80 font-bold">$</span>
+        </div>
+      </motion.div>
+    );
+  }
+  if (shape === 'spark') {
+    return (
+      <motion.div
+        className="absolute w-1 h-1 bg-[#D6FF34] rotate-45"
+        style={{ left: x, top: y }}
+        animate={{ scale: [0, 1, 0], opacity: [0, 0.8, 0] }}
+        transition={{ duration: 3, delay, repeat: Infinity, ease: 'easeInOut' }}
+      />
+    );
+  }
   return (
     <motion.div
       className="absolute w-1.5 h-1.5 rounded-full bg-[#D6FF34]"
       style={{ left: x, top: y, opacity: 0.4 }}
-      animate={{
-        y: [0, -8, 0],
-        opacity: [0.2, 0.6, 0.2],
-      }}
-      transition={{
-        duration: 4,
-        delay,
-        repeat: Infinity,
-        ease: 'easeInOut',
-      }}
+      animate={{ y: [0, -8, 0], opacity: [0.2, 0.6, 0.2] }}
+      transition={{ duration: 4, delay, repeat: Infinity, ease: 'easeInOut' }}
     />
   );
 }
@@ -199,11 +215,13 @@ export default function HomePage() {
         {/* Decorative background glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] pointer-events-none decorative-glow" />
 
-        {/* Floating neon dots */}
-        <FloatingDot delay={0} x="15%" y="20%" />
-        <FloatingDot delay={1.2} x="80%" y="30%" />
-        <FloatingDot delay={2.4} x="25%" y="70%" />
-        <FloatingDot delay={0.8} x="75%" y="65%" />
+        {/* Floating particles */}
+        <FloatingParticle delay={0} x="15%" y="20%" shape="dot" />
+        <FloatingParticle delay={1.2} x="80%" y="30%" shape="coin" />
+        <FloatingParticle delay={2.4} x="25%" y="70%" shape="spark" />
+        <FloatingParticle delay={0.8} x="75%" y="65%" shape="coin" />
+        <FloatingParticle delay={1.8} x="60%" y="15%" shape="dot" />
+        <FloatingParticle delay={3.0} x="10%" y="55%" shape="spark" />
 
         <motion.div
           initial={{ scale: 0.9 }}
@@ -212,28 +230,57 @@ export default function HomePage() {
           className="text-center space-y-8 max-w-md relative z-10"
         >
           <div>
-            {/* Pulsing neon green orb */}
-            <motion.div
-              className="w-20 h-20 rounded-full mx-auto mb-6 relative"
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ duration: 3, repeat: Infinity, repeatType: 'reverse' }}
-            >
+            {/* Dynamic hero orb with animated rings */}
+            <div className="relative w-28 h-28 mx-auto mb-8">
+              {/* Outer ambient glow */}
               <div
-                className="absolute inset-0 rounded-full bg-[#D6FF34] opacity-30 blur-xl"
+                className="absolute inset-0 rounded-full blur-2xl"
+                style={{ background: 'radial-gradient(circle, rgba(214,255,52,0.25) 0%, transparent 70%)', transform: 'scale(1.8)' }}
               />
-              <div
-                className="absolute inset-0 rounded-full bg-[#D6FF34] flex items-center justify-center"
-                style={{ boxShadow: '0 0 60px rgba(214,255,52,0.3)' }}
+
+              {/* Pulsing rings */}
+              {[1, 2, 3].map((i) => (
+                <motion.div
+                  key={i}
+                  className="absolute inset-0 rounded-full border border-[#D6FF34]"
+                  style={{ opacity: 0 }}
+                  animate={{
+                    scale: [1, 1.6 + i * 0.3],
+                    opacity: [0.4, 0],
+                  }}
+                  transition={{
+                    duration: 2.5,
+                    delay: i * 0.7,
+                    repeat: Infinity,
+                    ease: 'easeOut',
+                  }}
+                />
+              ))}
+
+              {/* Orb body */}
+              <motion.div
+                className="absolute inset-0 rounded-full flex items-center justify-center"
+                animate={{ scale: [1, 1.04, 1] }}
+                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                style={{
+                  background: 'linear-gradient(135deg, #D6FF34 0%, #b8d900 50%, #8faa00 100%)',
+                  boxShadow: '0 0 50px rgba(214,255,52,0.4), 0 0 100px rgba(214,255,52,0.15), inset 0 -4px 8px rgba(0,0,0,0.2)',
+                }}
               >
-                <svg className="w-10 h-10 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                {/* Shine */}
+                <div
+                  className="absolute top-2 left-1/2 -translate-x-1/2 w-10 h-3 rounded-full opacity-40"
+                  style={{ background: 'rgba(255,255,255,0.5)', filter: 'blur(2px)' }}
+                />
+                <svg className="w-12 h-12 text-black relative z-10" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z" />
                 </svg>
-              </div>
-            </motion.div>
+              </motion.div>
+            </div>
 
             <h1 className="text-3xl font-bold text-white mb-4">
               Your savings,<br />
-              <span className="text-[#D6FF34]">earning more</span>
+              <span className="text-[#D6FF34] shimmer-text">earning more</span>
             </h1>
 
             <p className="text-lg text-[#A0A0A0] mb-6">
@@ -313,25 +360,33 @@ export default function HomePage() {
         <Link href="/deposit">
           <motion.div
             whileTap={{ scale: 0.95 }}
-            whileHover={{ scale: 1.02 }}
-            className="p-4 bg-[#2B2C2A] border border-white/10 rounded-2xl flex items-center justify-center space-x-2 hover:border-[#D6FF34]/30 hover:shadow-[0_0_15px_rgba(214,255,52,0.1)] transition-all"
+            whileHover={{ scale: 1.02, boxShadow: '0 0 20px rgba(0,255,139,0.15)' }}
+            className="p-4 bg-[#2B2C2A] border border-white/10 rounded-2xl flex items-center justify-center space-x-3 hover:border-[#00FF8B]/30 transition-all"
           >
-            <svg className="w-5 h-5 text-[#D6FF34]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            <span className="font-medium text-white">Deposit</span>
+            {/* Deposit icon: coin dropping down */}
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(0,255,139,0.12)' }}>
+              <svg className="w-5 h-5 text-[#00FF8B]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <circle cx="12" cy="6" r="3" strokeLinejoin="round" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v10m-4-4 4 4 4-4" />
+              </svg>
+            </div>
+            <span className="font-semibold text-white">Deposit</span>
           </motion.div>
         </Link>
         <Link href="/withdraw">
           <motion.div
             whileTap={{ scale: 0.95 }}
-            whileHover={{ scale: 1.02 }}
-            className="p-4 bg-[#2B2C2A] border border-white/10 rounded-2xl flex items-center justify-center space-x-2 hover:border-[#D6FF34]/30 hover:shadow-[0_0_15px_rgba(214,255,52,0.1)] transition-all"
+            whileHover={{ scale: 1.02, boxShadow: '0 0 20px rgba(214,255,52,0.12)' }}
+            className="p-4 bg-[#2B2C2A] border border-white/10 rounded-2xl flex items-center justify-center space-x-3 hover:border-[#D6FF34]/30 transition-all"
           >
-            <svg className="w-5 h-5 text-[#D6FF34]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 20V4m8 8H4" />
-            </svg>
-            <span className="font-medium text-white">Withdraw</span>
+            {/* Withdraw icon: paper plane up */}
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(214,255,52,0.10)' }}>
+              <svg className="w-5 h-5 text-[#D6FF34]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 19V5m-4 4 4-4 4 4" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 21h14" />
+              </svg>
+            </div>
+            <span className="font-semibold text-white">Withdraw</span>
           </motion.div>
         </Link>
       </div>
@@ -421,12 +476,23 @@ export default function HomePage() {
                 className="flex items-center justify-between p-3 bg-[#2B2C2A] border border-white/10 rounded-xl"
               >
                 <div className="flex items-center space-x-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                     transaction.type === 'deposit'
                       ? 'bg-green-500/15 text-green-400'
-                      : 'bg-white/5 text-[#A0A0A0]'
+                      : 'bg-amber-500/15 text-amber-400'
                   }`}>
-                    {transaction.type === 'deposit' ? '\u2193' : '\u2191'}
+                    {transaction.type === 'deposit' ? (
+                      /* Coin drop icon */
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                        <circle cx="12" cy="5" r="2.5" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5v10m-3-3 3 3 3-3" />
+                      </svg>
+                    ) : (
+                      /* Paper plane icon */
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 19V5m-3.5 3.5L12 5l3.5 3.5M5 21h14" />
+                      </svg>
+                    )}
                   </div>
                   <div>
                     <p className="font-medium text-white text-sm">

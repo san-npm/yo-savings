@@ -6,6 +6,7 @@ import type { SavingsAccount } from '@/lib/accounts';
 import { formatBalance, formatPercentage } from '@/lib/format';
 import { AccountRowSkeleton } from './Skeleton';
 import { CountUp } from './CountUp';
+import { CurrencyIcon } from './CurrencyIcon';
 
 interface AccountRowProps {
   account: SavingsAccount;
@@ -14,31 +15,6 @@ interface AccountRowProps {
   isLoading?: boolean;
   index?: number;
 }
-
-const getCurrencyIcon = (accountId: string) => {
-  const iconClass = "w-8 h-8 rounded-full flex items-center justify-center text-white font-semibold text-sm";
-
-  switch (accountId) {
-    case 'dollar':
-      return (
-        <div className="relative">
-          <div className="absolute inset-0 rounded-full bg-[#00FF8B] blur-sm opacity-40" />
-          <div className={`${iconClass} bg-[#00FF8B] relative`}>
-            <span className="text-black">$</span>
-          </div>
-        </div>
-      );
-    case 'euro':
-      return (
-        <div className="relative">
-          <div className="absolute inset-0 rounded-full bg-[#4E6FFF] blur-sm opacity-40" />
-          <div className={`${iconClass} bg-[#4E6FFF] relative`}>&#8364;</div>
-        </div>
-      );
-    default:
-      return <div className={`${iconClass} bg-[#666666]`}>{accountId[0].toUpperCase()}</div>;
-  }
-};
 
 export function AccountRow({
   account,
@@ -51,51 +27,70 @@ export function AccountRow({
     return <AccountRowSkeleton />;
   }
 
-  const hoverColor = account.id === 'dollar'
-    ? 'hover:shadow-[0_0_20px_rgba(0,255,139,0.1)]'
-    : 'hover:shadow-[0_0_20px_rgba(78,111,255,0.1)]';
+  const isDollar = account.id === 'dollar';
+  const accentColor = isDollar ? '#00FF8B' : '#4E6FFF';
+  const hoverGlow = isDollar
+    ? '0 0 24px rgba(0,255,139,0.12)'
+    : '0 0 24px rgba(78,111,255,0.12)';
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
-      className={`bg-[#2B2C2A] border border-white/10 rounded-2xl hover:border-white/20 ${hoverColor} transition-all`}
+      whileHover={{ boxShadow: hoverGlow }}
+      className="bg-[#2B2C2A] border border-white/10 rounded-2xl hover:border-white/20 transition-all overflow-hidden group"
     >
-      <Link
-        href={`/accounts/${account.id}`}
-        className="flex items-center justify-between p-4"
-      >
+      {/* Subtle hover shine layer */}
+      <div
+        className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+        style={{
+          background: `linear-gradient(135deg, ${accentColor}06 0%, transparent 60%)`,
+        }}
+      />
+
+      <Link href={`/accounts/${account.id}`} className="flex items-center justify-between p-4 relative">
+        {/* Left: icon + info */}
         <div className="flex items-center space-x-4">
-          {getCurrencyIcon(account.id)}
+          <CurrencyIcon accountId={account.id} size="md" />
 
           <div>
-            <h3 className="font-medium text-white text-base">
-              {account.displayName}
-            </h3>
-            <div className="flex items-center space-x-2">
+            <h3 className="font-medium text-white text-base">{account.displayName}</h3>
+            <div className="flex items-center space-x-2 mt-0.5">
               <p className="text-sm text-[#D6FF34] font-medium">
                 {formatPercentage(annualRate)} annual rate
               </p>
               {balance > 0 && (
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/15 text-green-400 border border-green-500/20">
-                  Earning
-                </span>
+                <motion.span
+                  animate={{ opacity: [1, 0.6, 1] }}
+                  transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                  className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/15 text-green-400 border border-green-500/20"
+                >
+                  ● Earning
+                </motion.span>
               )}
             </div>
           </div>
         </div>
 
-        <div className="text-right">
-          <div className="font-semibold text-white tabular-nums text-lg">
-            <CountUp
-              end={balance}
-              duration={1000}
-              decimals={2}
-            >
-              {(value) => `${account.currencySymbol}${value.toFixed(2)}`}
-            </CountUp>
+        {/* Right: balance + chevron */}
+        <div className="flex items-center space-x-2">
+          <div className="text-right">
+            <div className="font-semibold text-white tabular-nums text-lg">
+              <CountUp end={balance} duration={1000} decimals={2}>
+                {(value) => `${account.currencySymbol}${value.toFixed(2)}`}
+              </CountUp>
+            </div>
           </div>
+          <svg
+            className="w-4 h-4 text-[#555555] group-hover:text-[#A0A0A0] transition-colors flex-shrink-0"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="m9 18 6-6-6-6" />
+          </svg>
         </div>
       </Link>
     </motion.div>

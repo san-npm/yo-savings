@@ -107,47 +107,85 @@ export function DepositForm({
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 22 }}
         className="flex flex-col items-center justify-center py-16 space-y-6"
       >
         <Confetti active={showSuccess} onComplete={() => {}} />
 
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-          className="w-16 h-16 rounded-full flex items-center justify-center bg-[#D6FF34] relative"
-        >
-          {/* Neon glow burst */}
-          <motion.div
-            className="absolute inset-0 rounded-full bg-[#D6FF34]"
-            initial={{ scale: 1, opacity: 0.5 }}
-            animate={{ scale: 2, opacity: 0 }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
-          />
-          <span className="text-2xl text-black relative z-10">&#10003;</span>
-        </motion.div>
+        {/* Success icon with dramatic pulse */}
+        <div className="relative">
+          {/* Ring bursts */}
+          {[0, 1, 2].map((i) => (
+            <motion.div
+              key={i}
+              className="absolute inset-0 rounded-full border-2 border-[#D6FF34]"
+              initial={{ scale: 1, opacity: 0.7 }}
+              animate={{ scale: 2.5 + i * 0.5, opacity: 0 }}
+              transition={{ duration: 0.9, delay: i * 0.15, ease: 'easeOut' }}
+            />
+          ))}
 
-        <div className="text-center space-y-2">
-          <h2 className="text-xl font-semibold text-white mb-2">Done!</h2>
+          <motion.div
+            initial={{ scale: 0, rotate: -30 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: 'spring', stiffness: 450, damping: 18, delay: 0.05 }}
+            className="w-20 h-20 rounded-full flex items-center justify-center relative"
+            style={{
+              background: 'linear-gradient(135deg, #D6FF34 0%, #a8cc1a 100%)',
+              boxShadow: '0 0 40px rgba(214,255,52,0.4), 0 0 80px rgba(214,255,52,0.2)',
+            }}
+          >
+            {/* Animated checkmark SVG */}
+            <svg className="w-10 h-10 text-black" viewBox="0 0 40 40" fill="none">
+              <motion.path
+                d="M8 20 L17 29 L33 13"
+                stroke="currentColor"
+                strokeWidth="3.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 0.5, delay: 0.2, ease: 'easeOut' }}
+              />
+            </svg>
+          </motion.div>
+        </div>
+
+        {/* Success card */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+          className="text-center space-y-2 p-5 rounded-2xl border border-[#D6FF34]/20 w-full"
+          style={{ background: 'rgba(214,255,52,0.06)' }}
+        >
+          <h2 className="text-2xl font-bold text-white">Deposited! 🎉</h2>
           <p className="text-[#A0A0A0]">
-            {account.currencySymbol}{successAmount} added to {account.displayName}
+            {account.currencySymbol}{successAmount.toFixed(2)} added to{' '}
+            <span className="text-white font-medium">{account.displayName}</span>
           </p>
+          <p className="text-xs text-[#666666]">Your savings are now earning interest</p>
           {localTxHash && (
             <a
               href={`https://basescan.org/tx/${localTxHash}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-[#D6FF34] hover:opacity-80 underline"
+              className="inline-block text-xs text-[#D6FF34] hover:opacity-80 underline mt-1"
             >
-              View transaction
+              View transaction ↗
             </a>
           )}
-        </div>
+        </motion.div>
 
         <motion.button
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
           whileTap={{ scale: 0.95 }}
+          whileHover={{ scale: 1.02 }}
           onClick={() => { setShowSuccess(false); onReset?.(); }}
-          className="px-6 py-3 text-black font-medium rounded-xl bg-[#D6FF34] hover:opacity-90 transition-opacity"
+          className="px-8 py-3 text-black font-semibold rounded-xl bg-[#D6FF34] hover:opacity-90 transition-opacity"
+          style={{ boxShadow: '0 0 20px rgba(214,255,52,0.3)' }}
         >
           Done
         </motion.button>

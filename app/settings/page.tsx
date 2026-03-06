@@ -61,18 +61,36 @@ function SettingsContent() {
 
         <div className="p-4 bg-[#2B2C2A] border border-white/10 rounded-2xl">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 rounded-full flex items-center justify-center bg-[#D6FF34]">
-              <span className="text-black font-semibold text-lg">
-                {user?.email?.address?.[0]?.toUpperCase() || 'U'}
-              </span>
+            {/* Avatar with spinning gradient ring */}
+            <div className="relative flex-shrink-0 w-14 h-14">
+              <motion.div
+                className="absolute inset-0 rounded-full"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
+                style={{
+                  background: 'conic-gradient(from 0deg, #D6FF34 0%, rgba(214,255,52,0.1) 40%, #D6FF34 70%, rgba(214,255,52,0.1) 100%)',
+                }}
+              />
+              <div
+                className="absolute inset-[2px] rounded-full flex items-center justify-center"
+                style={{
+                  background: 'linear-gradient(135deg, #D6FF34 0%, #a8cc1a 100%)',
+                  boxShadow: '0 0 16px rgba(214,255,52,0.25)',
+                }}
+              >
+                <span className="text-black font-bold text-xl">
+                  {user?.email?.address?.[0]?.toUpperCase() || 'U'}
+                </span>
+              </div>
             </div>
             <div>
-              <p className="font-medium text-white">
+              <p className="font-semibold text-white">
                 {user?.email?.address || 'Anonymous User'}
               </p>
-              <p className="text-sm text-[#666666]">
-                Signed in via email
-              </p>
+              <div className="flex items-center space-x-1.5 mt-0.5">
+                <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
+                <p className="text-sm text-[#666666]">Active account</p>
+              </div>
             </div>
           </div>
         </div>

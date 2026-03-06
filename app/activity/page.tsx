@@ -117,7 +117,7 @@ function ActivityContent() {
               onClick={() => setFilter(item.key as any)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                 filter === item.key
-                  ? 'bg-[#D6FF34] text-white shadow-lg'
+                  ? 'bg-[#D6FF34] text-black font-semibold shadow-lg'
                   : 'bg-white/5 text-[#A0A0A0] border border-white/10 hover:bg-white/10 hover:text-white'
               }`}
             >
@@ -184,39 +184,43 @@ function ActivityContent() {
               animate={{ opacity: 1 }}
               className="text-center py-12"
             >
-              <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4 mx-auto">
-                <svg className="w-8 h-8 text-[#666666]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
+              <div
+                className="w-20 h-20 rounded-full flex items-center justify-center mb-4 mx-auto"
+                style={{ background: 'linear-gradient(135deg, rgba(214,255,52,0.08) 0%, rgba(214,255,52,0.03) 100%)', border: '1px solid rgba(214,255,52,0.15)' }}
+              >
+                <span className="text-3xl">🌱</span>
               </div>
-              <h3 className="text-lg font-medium text-white mb-2">No transactions found</h3>
-              <p className="text-[#666666]">
-                {transactions.length === 0 ? 'Make your first deposit to see activity here' : 'Try adjusting your filters'}
+              <h3 className="text-lg font-semibold text-white mb-2">No transactions yet</h3>
+              <p className="text-[#666666] text-sm">
+                {transactions.length === 0 ? 'Make your first deposit to start earning' : 'Try adjusting your filters'}
               </p>
             </motion.div>
           ) : (
             filteredTransactions.map((transaction, index) => (
               <motion.div
                 key={transaction.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.05 }}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.04, type: 'spring', stiffness: 300, damping: 25 }}
                 className="p-4 bg-[#2B2C2A] border border-white/10 rounded-2xl hover:border-white/20 transition-all"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
                       transaction.type === 'deposit'
                         ? 'bg-green-500/15 text-green-400'
                         : 'bg-amber-500/15 text-amber-400'
                     }`}>
                       {transaction.type === 'deposit' ? (
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m0 0l-4-4m4 4l4-4" />
+                        /* Coin drop */
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                          <circle cx="12" cy="5" r="2.5" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5v10m-3-3 3 3 3-3" />
                         </svg>
                       ) : (
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 20V4m0 0l4 4m-4-4l-4 4" />
+                        /* Paper plane */
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
                         </svg>
                       )}
                     </div>
