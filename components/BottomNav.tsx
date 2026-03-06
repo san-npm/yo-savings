@@ -84,7 +84,8 @@ export function BottomNav() {
       initial={{ y: 100 }}
       animate={{ y: 0 }}
       transition={{ type: 'spring', stiffness: 400, damping: 35 }}
-      className="fixed bottom-0 left-0 right-0 bg-black/85 backdrop-blur-xl border-t border-white/10 safe-area-pb"
+      className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#E9ECEF] safe-area-pb"
+      style={{ boxShadow: '0 -4px 20px rgba(0,0,0,0.06)' }}
     >
       <div className="flex items-center justify-around px-4 py-2">
         {navItems.map(({ href, Icon, label }) => {
@@ -100,7 +101,7 @@ export function BottomNav() {
               href={href}
               className={cn(
                 'flex flex-col items-center justify-center min-w-0 flex-1 py-2 px-1 rounded-xl relative select-none',
-                isActive ? 'text-[#D6FF34]' : 'text-[#555555]'
+                isActive ? 'text-[#10B981]' : 'text-[#ADB5BD]'
               )}
             >
               {/* tap scale animation */}
@@ -120,26 +121,19 @@ export function BottomNav() {
               <span
                 className={cn(
                   'text-xs font-medium truncate transition-colors duration-200',
-                  isActive ? 'text-[#D6FF34]' : 'text-[#555555]'
+                  isActive ? 'text-[#10B981]' : 'text-[#ADB5BD]'
                 )}
               >
                 {label}
               </span>
 
-              {/* Glowing active dot */}
+              {/* Active indicator dot */}
               {isActive && (
                 <motion.div
                   layoutId="activeTab"
-                  className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#D6FF34]"
-                  style={{
-                    boxShadow:
-                      '0 0 6px 2px rgba(214,255,52,0.7), 0 0 12px 4px rgba(214,255,52,0.3)',
-                  }}
-                  animate={{ opacity: [0.6, 1, 0.6] }}
-                  transition={{
-                    opacity: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
-                    layout: { type: 'spring', stiffness: 500, damping: 30 },
-                  }}
+                  className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#10B981]"
+                  style={{ boxShadow: '0 0 6px 2px rgba(16,185,129,0.5)' }}
+                  transition={{ layout: { type: 'spring', stiffness: 500, damping: 30 } }}
                 />
               )}
             </Link>

@@ -55,11 +55,11 @@ function CustomTooltip({ active, payload }: any) {
   if (!active || !payload?.length) return null;
   const data = payload[0].payload;
   return (
-    <div className="bg-[#2B2C2A] border border-white/10 rounded-lg px-3 py-2 shadow-xl">
-      <div className="text-sm font-semibold text-white tabular-nums">
+    <div className="bg-white border border-[#E9ECEF] rounded-lg px-3 py-2 shadow-md">
+      <div className="text-sm font-semibold text-[#1A1A2E] tabular-nums">
         ${data.balance.toLocaleString()}
       </div>
-      <div className="text-xs text-green-400 tabular-nums">
+      <div className="text-xs text-[#10B981] tabular-nums">
         +${data.earnings.toLocaleString()} earned
       </div>
     </div>
@@ -88,11 +88,11 @@ export function SimulationChart({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="p-5 bg-[#2B2C2A] border border-white/10 rounded-2xl space-y-5"
+      className="p-5 bg-[#F8F9FA] border border-[#E9ECEF] rounded-2xl space-y-5"
     >
       <div className="flex items-center justify-between">
-        <h3 className="text-base font-semibold text-white">Growth Simulator</h3>
-        <span className="text-xs text-[#666666]">
+        <h3 className="text-base font-semibold text-[#1A1A2E]">Growth Simulator</h3>
+        <span className="text-xs text-[#ADB5BD]">
           {currentApy > 0
             ? `Based on ${currentApy.toFixed(1)}% APY (7d)`
             : 'Loading rate...'}
@@ -101,9 +101,9 @@ export function SimulationChart({
 
       {/* Deposit Amount Input */}
       <div className="space-y-3">
-        <label className="text-xs text-[#666666]">Deposit amount</label>
+        <label className="text-xs text-[#6C757D]">Deposit amount</label>
         <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#666666] text-lg">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#ADB5BD] text-lg">
             {accountCurrencySymbol}
           </span>
           <input
@@ -114,7 +114,7 @@ export function SimulationChart({
               const cleaned = e.target.value.replace(/[^0-9.]/g, '');
               setAmount(cleaned);
             }}
-            className="w-full pl-8 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-lg font-semibold tabular-nums outline-none focus:border-[#D6FF34]/50 transition-colors"
+            className="w-full pl-8 pr-4 py-2.5 bg-white border border-[#E9ECEF] rounded-xl text-[#1A1A2E] text-lg font-semibold tabular-nums outline-none focus:border-[#10B981] focus:ring-2 focus:ring-[#10B981]/20 transition-colors"
           />
         </div>
 
@@ -127,8 +127,8 @@ export function SimulationChart({
               onClick={() => setAmount(qa.toString())}
               className={`flex-1 py-1.5 text-xs font-medium rounded-lg border transition-all ${
                 amount === qa.toString()
-                  ? 'bg-white/10 border-white/20 text-white'
-                  : 'bg-white/5 border-white/5 text-[#666666] hover:text-[#A0A0A0] hover:border-white/10'
+                  ? 'bg-[#ECFDF5] border-[#10B981]/30 text-[#10B981]'
+                  : 'bg-white border-[#E9ECEF] text-[#6C757D] hover:text-[#1A1A2E] hover:border-[#DEE2E6]'
               }`}
             >
               ${qa.toLocaleString()}
@@ -145,8 +145,8 @@ export function SimulationChart({
             onClick={() => setPeriod(p.key)}
             className={`flex-1 py-2 text-sm font-medium rounded-xl border transition-all ${
               period === p.key
-                ? 'bg-[#D6FF34] text-black border-transparent shadow-lg'
-                : 'bg-white/5 border-white/10 text-[#A0A0A0] hover:text-white hover:bg-white/8'
+                ? 'bg-[#10B981] text-white border-transparent shadow-sm'
+                : 'bg-white border-[#E9ECEF] text-[#6C757D] hover:text-[#1A1A2E] hover:border-[#DEE2E6]'
             }`}
           >
             {p.label}
@@ -161,19 +161,19 @@ export function SimulationChart({
             <AreaChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="simGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#D6FF34" stopOpacity={0.3} />
-                  <stop offset="100%" stopColor="#D6FF34" stopOpacity={0} />
+                  <stop offset="0%" stopColor="#10B981" stopOpacity={0.2} />
+                  <stop offset="100%" stopColor="#10B981" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <XAxis
                 dataKey="label"
-                tick={{ fill: '#666666', fontSize: 10 }}
+                tick={{ fill: '#ADB5BD', fontSize: 10 }}
                 axisLine={false}
                 tickLine={false}
                 interval="preserveStartEnd"
               />
               <YAxis
-                tick={{ fill: '#666666', fontSize: 10 }}
+                tick={{ fill: '#ADB5BD', fontSize: 10 }}
                 axisLine={false}
                 tickLine={false}
                 tickFormatter={(v) => `$${(v / 1000).toFixed(v >= 1000 ? 1 : 0)}${v >= 1000 ? 'k' : ''}`}
@@ -182,7 +182,7 @@ export function SimulationChart({
               <Area
                 type="monotone"
                 dataKey="balance"
-                stroke="#D6FF34"
+                stroke="#10B981"
                 strokeWidth={2}
                 fill="url(#simGradient)"
                 animationDuration={800}
@@ -195,22 +195,22 @@ export function SimulationChart({
       {/* Projected Result */}
       {principal > 0 && currentApy > 0 && (
         <div className="grid grid-cols-2 gap-3">
-          <div className="p-3 bg-white/5 rounded-xl border border-white/5">
-            <p className="text-xs text-[#666666] mb-1">Projected Total</p>
-            <p className="text-lg font-semibold text-white tabular-nums">
+          <div className="p-3 bg-white rounded-xl border border-[#E9ECEF]">
+            <p className="text-xs text-[#6C757D] mb-1">Projected Total</p>
+            <p className="text-lg font-semibold text-[#1A1A2E] tabular-nums">
               {accountCurrencySymbol}{finalBalance.toLocaleString()}
             </p>
           </div>
-          <div className="p-3 bg-green-500/10 rounded-xl border border-green-500/20">
-            <p className="text-xs text-green-400/80 mb-1">Estimated Earnings</p>
-            <p className="text-lg font-semibold text-green-400 tabular-nums">
+          <div className="p-3 bg-[#ECFDF5] rounded-xl border border-[#10B981]/20">
+            <p className="text-xs text-[#10B981]/80 mb-1">Estimated Earnings</p>
+            <p className="text-lg font-semibold text-[#10B981] tabular-nums">
               +{accountCurrencySymbol}{totalEarnings.toLocaleString()}
             </p>
           </div>
         </div>
       )}
 
-      <p className="text-[10px] text-[#666666] text-center">
+      <p className="text-[10px] text-[#ADB5BD] text-center">
         Projections are estimates based on current APY and may vary. Past performance does not guarantee future results.
       </p>
     </motion.div>

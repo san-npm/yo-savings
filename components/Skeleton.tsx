@@ -20,15 +20,15 @@ export function Skeleton({ className }: SkeletonProps) {
 export function BalanceSkeleton() {
   return (
     <div className="space-y-3">
-      <Skeleton className="h-4 w-24 bg-white/10" />
-      <Skeleton className="h-10 w-32 bg-white/10" />
+      <Skeleton className="h-4 w-24" />
+      <Skeleton className="h-10 w-32" />
     </div>
   );
 }
 
 export function AccountRowSkeleton() {
   return (
-    <div className="bg-[#2B2C2A] border border-white/10 rounded-2xl p-4">
+    <div className="bg-[#F8F9FA] border border-[#E9ECEF] rounded-2xl p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <Skeleton className="w-8 h-8 rounded-full" />

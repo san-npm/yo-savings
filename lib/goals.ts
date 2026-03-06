@@ -5,7 +5,7 @@ export interface SavingsGoal {
   name: string;
   emoji: string;
   targetAmount: number;
-  currentAmount: number;
+  currentAmount: number; // Kept for backwards compat; synced from chain, not user-editable
   linkedAccountId: AccountId;
   createdAt: string;
   updatedAt: string;
@@ -26,7 +26,7 @@ const getDefaultGoals = (): SavingsGoal[] => [
     name: 'Vacation Fund',
     emoji: '\u{1F3D6}\u{FE0F}',
     targetAmount: 5000,
-    currentAmount: 1250,
+    currentAmount: 0,
     linkedAccountId: 'dollar',
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
@@ -36,7 +36,7 @@ const getDefaultGoals = (): SavingsGoal[] => [
     name: 'Emergency Fund',
     emoji: '\u{1F6E1}\u{FE0F}',
     targetAmount: 10000,
-    currentAmount: 3500,
+    currentAmount: 0,
     linkedAccountId: 'dollar',
     createdAt: '2024-01-15T00:00:00Z',
     updatedAt: '2024-01-15T00:00:00Z',
@@ -68,10 +68,14 @@ export const loadGoals = (userAddress?: string): SavingsGoal[] => {
   return getDefaultGoals();
 };
 
-export const createGoal = (goal: Omit<SavingsGoal, 'id' | 'createdAt' | 'updatedAt'>, userAddress?: string): SavingsGoal => {
+export const createGoal = (
+  goal: Omit<SavingsGoal, 'id' | 'createdAt' | 'updatedAt' | 'currentAmount'>,
+  userAddress?: string
+): SavingsGoal => {
   const goals = loadGoals(userAddress);
   const newGoal: SavingsGoal = {
     ...goal,
+    currentAmount: 0, // Always starts at 0; real progress comes from chain balance
     id: `goal_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -82,7 +86,11 @@ export const createGoal = (goal: Omit<SavingsGoal, 'id' | 'createdAt' | 'updated
   return newGoal;
 };
 
-export const updateGoal = (id: string, updates: Partial<SavingsGoal>, userAddress?: string): SavingsGoal | null => {
+export const updateGoal = (
+  id: string,
+  updates: Partial<Omit<SavingsGoal, 'currentAmount'>>,
+  userAddress?: string
+): SavingsGoal | null => {
   const goals = loadGoals(userAddress);
   const goalIndex = goals.findIndex(g => g.id === id);
 
@@ -111,11 +119,9 @@ export const deleteGoal = (id: string, userAddress?: string): boolean => {
   return false;
 };
 
-export const updateGoalProgress = (goalId: string, newAmount: number, userAddress?: string): SavingsGoal | null => {
-  return updateGoal(goalId, { currentAmount: newAmount }, userAddress);
-};
-
-export const getGoalProgress = (goal: SavingsGoal): number => {
+/** Compute percentage progress using real balance from chain */
+export const getGoalProgress = (goal: SavingsGoal, realBalance?: number): number => {
+  const current = realBalance !== undefined ? realBalance : goal.currentAmount;
   if (goal.targetAmount <= 0) return 0;
-  return Math.min((goal.currentAmount / goal.targetAmount) * 100, 100);
+  return Math.min((current / goal.targetAmount) * 100, 100);
 };

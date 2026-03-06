@@ -20,15 +20,15 @@ const coinConfig: Record<string, {
   textColor: string;
 }> = {
   dollar: {
-    gradient: 'linear-gradient(135deg, #00FF8B 0%, #00cc6e 40%, #009950 100%)',
-    glow: 'rgba(0,255,139,0.45)',
+    gradient: 'linear-gradient(135deg, #34D399 0%, #10B981 40%, #059669 100%)',
+    glow: 'rgba(16,185,129,0.35)',
     highlight: 'rgba(255,255,255,0.3)',
     symbol: '$',
-    textColor: '#000',
+    textColor: '#fff',
   },
   euro: {
-    gradient: 'linear-gradient(135deg, #6B8FFF 0%, #4E6FFF 40%, #3050CC 100%)',
-    glow: 'rgba(78,111,255,0.45)',
+    gradient: 'linear-gradient(135deg, #93C5FD 0%, #3B82F6 40%, #1D4ED8 100%)',
+    glow: 'rgba(59,130,246,0.35)',
     highlight: 'rgba(255,255,255,0.25)',
     symbol: '€',
     textColor: '#fff',
@@ -37,8 +37,8 @@ const coinConfig: Record<string, {
 
 export function CurrencyIcon({ accountId, size = 'md', className = '' }: CurrencyIconProps) {
   const config = coinConfig[accountId] ?? {
-    gradient: 'linear-gradient(135deg, #666 0%, #444 100%)',
-    glow: 'rgba(100,100,100,0.4)',
+    gradient: 'linear-gradient(135deg, #9CA3AF 0%, #6B7280 100%)',
+    glow: 'rgba(100,100,100,0.2)',
     highlight: 'rgba(255,255,255,0.15)',
     symbol: accountId[0]?.toUpperCase() ?? '?',
     textColor: '#fff',
@@ -60,15 +60,13 @@ export function CurrencyIcon({ accountId, size = 'md', className = '' }: Currenc
         style={{
           background: config.gradient,
           color: config.textColor,
-          boxShadow: `inset 0 -3px 6px rgba(0,0,0,0.25), inset 0 1px 2px rgba(255,255,255,0.3), 0 2px 8px ${config.glow}`,
+          boxShadow: `inset 0 -3px 6px rgba(0,0,0,0.15), inset 0 1px 2px rgba(255,255,255,0.3), 0 2px 8px ${config.glow}`,
         }}
       >
         {/* Inner edge rim */}
         <div
           className="absolute inset-0 rounded-full"
-          style={{
-            boxShadow: 'inset 0 0 0 2px rgba(255,255,255,0.12)',
-          }}
+          style={{ boxShadow: 'inset 0 0 0 2px rgba(255,255,255,0.12)' }}
         />
 
         {/* Shine/reflection highlight */}
@@ -78,7 +76,7 @@ export function CurrencyIcon({ accountId, size = 'md', className = '' }: Currenc
         />
 
         {/* Symbol */}
-        <span className="relative z-10 select-none" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.25)' }}>
+        <span className="relative z-10 select-none" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.2)' }}>
           {config.symbol}
         </span>
       </div>

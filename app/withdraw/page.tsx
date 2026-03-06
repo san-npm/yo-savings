@@ -33,20 +33,20 @@ function AccountOptionItem({
       disabled={!balance || balance <= 0}
       className={`w-full p-3 rounded-xl border transition-all ${
         isSelected
-          ? 'bg-white/5 border-white/20 shadow-[0_0_15px_rgba(214,255,52,0.15)]'
+          ? 'bg-[#ECFDF5] border-[#10B981]/30 shadow-sm'
           : balance && balance > 0
-          ? 'bg-[#2B2C2A] border-white/10 hover:border-white/20'
-          : 'bg-[#2B2C2A] border-white/5 text-[#666666] cursor-not-allowed opacity-50'
+          ? 'bg-[#F8F9FA] border-[#E9ECEF] hover:border-[#DEE2E6]'
+          : 'bg-[#F8F9FA] border-[#E9ECEF] opacity-50 cursor-not-allowed'
       }`}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <CurrencyIcon accountId={account.id} size="sm" />
-          <span className={`font-medium ${isSelected ? 'text-white' : 'text-[#A0A0A0]'}`}>
+          <span className={`font-medium ${isSelected ? 'text-[#1A1A2E]' : 'text-[#6C757D]'}`}>
             {account.displayName}
           </span>
         </div>
-        <div className={`text-sm tabular-nums ${isSelected ? 'text-white' : 'text-[#A0A0A0]'}`}>
+        <div className={`text-sm tabular-nums ${isSelected ? 'text-[#1A1A2E]' : 'text-[#6C757D]'}`}>
           {account.currencySymbol}{balance.toFixed(2)}
         </div>
       </div>
@@ -102,7 +102,7 @@ export default function WithdrawPage() {
   if (!address) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-[#666666]">Please sign in first</p>
+        <p className="text-[#6C757D]">Please sign in first</p>
       </div>
     );
   }
@@ -115,15 +115,12 @@ export default function WithdrawPage() {
     >
       {/* Header */}
       <div className="flex items-center justify-between">
-        <Link
-          href="/"
-          className="p-2 hover:bg-white/5 rounded-xl transition-colors"
-        >
-          <svg className="w-5 h-5 text-[#A0A0A0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <Link href="/" className="p-2 hover:bg-[#F8F9FA] rounded-xl transition-colors">
+          <svg className="w-5 h-5 text-[#6C757D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </Link>
-        <h1 className="text-lg font-medium text-white">Withdraw</h1>
+        <h1 className="text-lg font-medium text-[#1A1A2E]">Withdraw</h1>
         <div className="w-8" />
       </div>
 
@@ -135,7 +132,7 @@ export default function WithdrawPage() {
           transition={{ delay: 0.1 }}
           className="space-y-4"
         >
-          <h2 className="text-sm font-medium text-[#666666]">
+          <h2 className="text-sm font-medium text-[#6C757D]">
             Choose Account to Withdraw From
           </h2>
 
@@ -177,31 +174,29 @@ export default function WithdrawPage() {
         transition={{ delay: 0.3 }}
         className="space-y-4"
       >
-        <div className="p-4 bg-[#2B2C2A] border border-white/10 rounded-xl">
-          <h3 className="text-sm font-medium text-white mb-2">
-            Withdrawal Details
-          </h3>
-          <div className="space-y-2 text-xs text-[#666666]">
+        <div className="p-4 bg-[#F8F9FA] border border-[#E9ECEF] rounded-xl">
+          <h3 className="text-sm font-medium text-[#1A1A2E] mb-2">Withdrawal Details</h3>
+          <div className="space-y-2 text-xs text-[#6C757D]">
             <div className="flex items-start space-x-2">
-              <span className="text-[#D6FF34] mt-0.5">&bull;</span>
+              <span className="text-[#10B981] mt-0.5">&bull;</span>
               <span>Funds available in your account instantly</span>
             </div>
             <div className="flex items-start space-x-2">
-              <span className="text-[#D6FF34] mt-0.5">&bull;</span>
+              <span className="text-[#10B981] mt-0.5">&bull;</span>
               <span>No withdrawal fees or penalties</span>
             </div>
             <div className="flex items-start space-x-2">
-              <span className="text-[#D6FF34] mt-0.5">&bull;</span>
+              <span className="text-[#10B981] mt-0.5">&bull;</span>
               <span>Processing typically takes 1-2 minutes</span>
             </div>
           </div>
         </div>
 
-        <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+        <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
           <div className="flex items-center space-x-2 mb-2">
-            <span className="text-sm font-semibold text-amber-400">Important</span>
+            <span className="text-sm font-semibold text-amber-700">Important</span>
           </div>
-          <p className="text-xs text-[#A0A0A0]">
+          <p className="text-xs text-amber-700/80">
             Withdrawn funds will stop earning interest immediately. You can deposit again anytime to resume earning.
           </p>
         </div>

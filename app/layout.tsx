@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'black-translucent',
+    statusBarStyle: 'default',
     title: 'Yo Savings',
   },
   icons: {
@@ -32,7 +32,7 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-  themeColor: '#000000',
+  themeColor: '#FFFFFF',
 };
 
 export default function RootLayout({
@@ -42,7 +42,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${spaceGrotesk.variable}`}>
-      <body style={{ minHeight: '100vh' }} className="bg-black">
+      <body style={{ minHeight: '100vh' }} className="bg-white">
         <ClientOnly>
           <Providers>
             <Bootstrap />

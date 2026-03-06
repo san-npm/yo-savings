@@ -12,7 +12,7 @@ interface Transaction {
   amount: number;
   account: string;
   accountId: string;
-  date: number; // timestamp
+  date: number;
   status: 'completed';
   hash: string;
 }
@@ -99,13 +99,12 @@ function ActivityContent() {
     >
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-2xl font-bold text-white">Activity</h1>
-        <p className="text-[#A0A0A0]">Your transaction history</p>
+        <h1 className="text-2xl font-bold text-[#1A1A2E]">Activity</h1>
+        <p className="text-[#6C757D]">Your transaction history</p>
       </div>
 
       {/* Filters */}
       <div className="space-y-3">
-        {/* Transaction Type Filter */}
         <div className="flex space-x-2">
           {[
             { key: 'all', label: 'All' },
@@ -117,8 +116,8 @@ function ActivityContent() {
               onClick={() => setFilter(item.key as any)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                 filter === item.key
-                  ? 'bg-[#D6FF34] text-black font-semibold shadow-lg'
-                  : 'bg-white/5 text-[#A0A0A0] border border-white/10 hover:bg-white/10 hover:text-white'
+                  ? 'bg-[#10B981] text-white font-semibold shadow-sm'
+                  : 'bg-[#F8F9FA] text-[#6C757D] border border-[#E9ECEF] hover:bg-[#F1F3F5] hover:text-[#1A1A2E]'
               }`}
             >
               {item.label}
@@ -126,7 +125,6 @@ function ActivityContent() {
           ))}
         </div>
 
-        {/* Account Filter */}
         <div className="flex space-x-2 overflow-x-auto">
           {[
             { key: 'all', label: 'All Accounts' },
@@ -138,8 +136,8 @@ function ActivityContent() {
               onClick={() => setAccountFilter(item.key)}
               className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
                 accountFilter === item.key
-                  ? 'bg-white/10 border border-white/20 text-white'
-                  : 'bg-white/5 text-[#666666] border border-white/5 hover:bg-white/8 hover:text-[#A0A0A0]'
+                  ? 'bg-[#F8F9FA] border border-[#DEE2E6] text-[#1A1A2E]'
+                  : 'bg-white text-[#ADB5BD] border border-[#E9ECEF] hover:bg-[#F8F9FA] hover:text-[#6C757D]'
               }`}
             >
               {item.label}
@@ -150,8 +148,8 @@ function ActivityContent() {
 
       {/* Error State */}
       {error && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
-          <p className="text-sm text-red-400">{error}</p>
+        <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+          <p className="text-sm text-red-600">{error}</p>
         </div>
       )}
 
@@ -159,7 +157,7 @@ function ActivityContent() {
       {isLoading && (
         <div className="space-y-3">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="p-4 bg-[#2B2C2A] border border-white/10 rounded-2xl">
+            <div key={i} className="p-4 bg-[#F8F9FA] border border-[#E9ECEF] rounded-2xl">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   <div className="w-10 h-10 rounded-full loading-pulse" />
@@ -184,14 +182,11 @@ function ActivityContent() {
               animate={{ opacity: 1 }}
               className="text-center py-12"
             >
-              <div
-                className="w-20 h-20 rounded-full flex items-center justify-center mb-4 mx-auto"
-                style={{ background: 'linear-gradient(135deg, rgba(214,255,52,0.08) 0%, rgba(214,255,52,0.03) 100%)', border: '1px solid rgba(214,255,52,0.15)' }}
-              >
+              <div className="w-20 h-20 rounded-full flex items-center justify-center mb-4 mx-auto bg-[#ECFDF5] border border-[#10B981]/20">
                 <span className="text-3xl">🌱</span>
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">No transactions yet</h3>
-              <p className="text-[#666666] text-sm">
+              <h3 className="text-lg font-semibold text-[#1A1A2E] mb-2">No transactions yet</h3>
+              <p className="text-[#6C757D] text-sm">
                 {transactions.length === 0 ? 'Make your first deposit to start earning' : 'Try adjusting your filters'}
               </p>
             </motion.div>
@@ -202,23 +197,21 @@ function ActivityContent() {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.04, type: 'spring', stiffness: 300, damping: 25 }}
-                className="p-4 bg-[#2B2C2A] border border-white/10 rounded-2xl hover:border-white/20 transition-all"
+                className="p-4 bg-[#F8F9FA] border border-[#E9ECEF] rounded-2xl hover:border-[#DEE2E6] hover:shadow-sm transition-all"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
                       transaction.type === 'deposit'
-                        ? 'bg-green-500/15 text-green-400'
-                        : 'bg-amber-500/15 text-amber-400'
+                        ? 'bg-[#ECFDF5] text-[#10B981]'
+                        : 'bg-amber-50 text-amber-500'
                     }`}>
                       {transaction.type === 'deposit' ? (
-                        /* Coin drop */
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                           <circle cx="12" cy="5" r="2.5" />
                           <path strokeLinecap="round" strokeLinejoin="round" d="M12 7.5v10m-3-3 3 3 3-3" />
                         </svg>
                       ) : (
-                        /* Paper plane */
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
                         </svg>
@@ -227,14 +220,14 @@ function ActivityContent() {
 
                     <div className="space-y-1">
                       <div className="flex items-center space-x-2">
-                        <h3 className="font-medium text-white">
+                        <h3 className="font-medium text-[#1A1A2E]">
                           {transaction.type === 'deposit' ? 'Deposit' : 'Withdrawal'}
                         </h3>
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20">
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-[#ECFDF5] text-[#10B981] border border-[#10B981]/20">
                           completed
                         </span>
                       </div>
-                      <div className="flex items-center space-x-2 text-sm text-[#666666]">
+                      <div className="flex items-center space-x-2 text-sm text-[#ADB5BD]">
                         <span>{transaction.account}</span>
                         <span>&bull;</span>
                         <span>{formatDate(transaction.date)}</span>
@@ -243,7 +236,7 @@ function ActivityContent() {
                           href={`https://basescan.org/tx/${transaction.hash}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="font-mono text-[#D6FF34] hover:opacity-80 underline"
+                          className="font-mono text-[#10B981] hover:text-[#059669] underline"
                         >
                           {transaction.hash.slice(0, 6)}...{transaction.hash.slice(-4)}
                         </a>
@@ -253,7 +246,7 @@ function ActivityContent() {
 
                   <div className="text-right">
                     <div className={`font-semibold text-lg tabular-nums ${
-                      transaction.type === 'deposit' ? 'text-green-400' : 'text-amber-400'
+                      transaction.type === 'deposit' ? 'text-[#10B981]' : 'text-amber-500'
                     }`}>
                       {transaction.type === 'deposit' ? '+' : '-'}${transaction.amount.toLocaleString()}
                     </div>
@@ -265,7 +258,6 @@ function ActivityContent() {
         </div>
       )}
 
-      {/* Bottom spacing for nav */}
       <div className="pb-20" />
     </motion.div>
   );
