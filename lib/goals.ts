@@ -1,5 +1,40 @@
 import { AccountId } from './accounts';
 
+const ACCOUNT_IDS: AccountId[] = ['dollar', 'euro'];
+
+const isAccountId = (value: unknown): value is AccountId => {
+  return typeof value === 'string' && ACCOUNT_IDS.includes(value as AccountId);
+};
+
+const sanitizeGoal = (raw: unknown): SavingsGoal | null => {
+  if (!raw || typeof raw !== 'object') return null;
+  const candidate = raw as Partial<SavingsGoal>;
+
+  if (
+    typeof candidate.id !== 'string' ||
+    typeof candidate.name !== 'string' ||
+    typeof candidate.emoji !== 'string' ||
+    typeof candidate.targetAmount !== 'number' ||
+    typeof candidate.currentAmount !== 'number' ||
+    !isAccountId(candidate.linkedAccountId) ||
+    typeof candidate.createdAt !== 'string' ||
+    typeof candidate.updatedAt !== 'string'
+  ) {
+    return null;
+  }
+
+  return {
+    id: candidate.id,
+    name: candidate.name,
+    emoji: candidate.emoji,
+    targetAmount: candidate.targetAmount,
+    currentAmount: candidate.currentAmount,
+    linkedAccountId: candidate.linkedAccountId,
+    createdAt: candidate.createdAt,
+    updatedAt: candidate.updatedAt,
+  };
+};
+
 export interface SavingsGoal {
   id: string;
   name: string;
@@ -59,7 +94,13 @@ export const loadGoals = (userAddress?: string): SavingsGoal[] => {
       const stored = localStorage.getItem(getStorageKey(userAddress));
       if (stored) {
         const parsed = JSON.parse(stored);
-        return Array.isArray(parsed) ? parsed : getDefaultGoals();
+        if (!Array.isArray(parsed)) return getDefaultGoals();
+
+        const sanitized = parsed
+          .map((goal) => sanitizeGoal(goal))
+          .filter((goal): goal is SavingsGoal => goal !== null);
+
+        return sanitized.length > 0 ? sanitized : getDefaultGoals();
       }
     } catch (error) {
       console.error('Failed to load goals from localStorage:', error);

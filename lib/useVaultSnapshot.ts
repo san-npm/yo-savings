@@ -25,6 +25,9 @@ export function useVaultSnapshot(vault: Address): UseVaultSnapshotResult {
 
   useEffect(() => {
     if (!client) {
+      setSnapshot(undefined);
+      setIsError(false);
+      setError(null);
       setIsLoading(false);
       return;
     }

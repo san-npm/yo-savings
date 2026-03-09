@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useState } from 'react';
 import type { SavingsGoal } from '@/lib/goals';
-import { getAccountById } from '@/lib/accounts';
+import { getAccountById, getDefaultAccount } from '@/lib/accounts';
 import { formatCurrency } from '@/lib/format';
 import { GoalLadder } from './GoalLadder';
 
@@ -19,7 +19,7 @@ interface GoalCardProps {
 export function GoalCard({ goal, currentBalance, onEdit, onDelete, index = 0 }: GoalCardProps) {
   const [showMenu, setShowMenu] = useState(false);
 
-  const account = getAccountById(goal.linkedAccountId);
+  const account = getAccountById(goal.linkedAccountId) ?? getDefaultAccount();
   const currencyMap = { dollar: 'USD', euro: 'EUR' } as const;
   const currency = currencyMap[goal.linkedAccountId] ?? 'USD';
 

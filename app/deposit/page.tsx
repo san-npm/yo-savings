@@ -8,7 +8,7 @@ import { useDeposit } from '@yo-protocol/react';
 import { parseTokenAmount } from '@yo-protocol/core';
 import { useYoClient } from '@/lib/useYoClient';
 
-import { getAccountById, getAllAccounts, type AccountId } from '@/lib/accounts';
+import { getAccountById, getAllAccounts, isAccountId, type AccountId } from '@/lib/accounts';
 import { DepositForm } from '@/components/DepositForm';
 import { CurrencyIcon } from '@/components/CurrencyIcon';
 
@@ -16,18 +16,24 @@ export default function DepositPage() {
   const searchParams = useSearchParams();
   const { address } = useYoClient();
 
-  const preselectedAccountId = searchParams.get('account') as AccountId | null;
-  const [selectedAccountId, setSelectedAccountId] = useState<AccountId>(
-    preselectedAccountId || 'dollar'
-  );
+  const accountParam = searchParams.get('account');
+  const preselectedAccountId = accountParam && isAccountId(accountParam) ? accountParam : null;
+  const [selectedAccountId, setSelectedAccountId] = useState<AccountId>(preselectedAccountId || 'dollar');
 
   const selectedAccount = getAccountById(selectedAccountId);
+
+  if (!selectedAccount) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-[#6C757D]">Account not found</p>
+      </div>
+    );
+  }
   const allAccounts = getAllAccounts();
 
   const {
     deposit,
     isLoading: depositLoading,
-    hash,
     reset: resetDeposit,
   } = useDeposit({
     vault: selectedAccount.vaultAddress as `0x${string}`,
