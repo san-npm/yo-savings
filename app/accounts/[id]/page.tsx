@@ -8,7 +8,7 @@ import { useUserBalance, useVaultHistory } from '@yo-protocol/react';
 import { useVaultSnapshot } from '@/lib/useVaultSnapshot';
 import { useYoClient } from '@/lib/useYoClient';
 
-import { getAccountById, type AccountId } from '@/lib/accounts';
+import { getAccountById, getDefaultAccount } from '@/lib/accounts';
 import { EarningsChart } from '@/components/EarningsChart';
 import { formatBalance, formatPercentage } from '@/lib/format';
 import { CurrencyIcon } from '@/components/CurrencyIcon';
@@ -23,26 +23,27 @@ interface Transaction {
 
 export default function AccountDetailPage() {
   const params = useParams();
-  const accountId = params.id as AccountId;
+  const accountId = typeof params.id === 'string' ? params.id : '';
   const { client, address } = useYoClient();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [transactionsLoading, setTransactionsLoading] = useState(true);
 
   const account = getAccountById(accountId);
+  const activeAccount = account ?? getDefaultAccount();
   const { position, isLoading: balanceLoading } = useUserBalance(
-    account.vaultAddress as `0x${string}`,
+    activeAccount.vaultAddress as `0x${string}`,
     address
   );
   const { yieldHistory, isLoading: historyLoading } = useVaultHistory(
-    account.vaultAddress as `0x${string}`
+    activeAccount.vaultAddress as `0x${string}`
   );
   const { snapshot, isLoading: snapshotLoading } = useVaultSnapshot(
-    account.vaultAddress as `0x${string}`
+    activeAccount.vaultAddress as `0x${string}`
   );
 
   useEffect(() => {
     const fetchTransactions = async () => {
-      if (!address || !client) return;
+      if (!address || !client || !account) return;
 
       try {
         setTransactionsLoading(true);
@@ -69,7 +70,7 @@ export default function AccountDetailPage() {
     };
 
     fetchTransactions();
-  }, [address, account.vaultAddress, client]);
+  }, [account, address, client]);
 
   if (!account) {
     return (

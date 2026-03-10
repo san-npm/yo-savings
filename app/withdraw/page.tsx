@@ -8,7 +8,7 @@ import { useUserBalance, useRedeem } from '@yo-protocol/react';
 import { useYoClient } from '@/lib/useYoClient';
 import { parseTokenAmount } from '@yo-protocol/core';
 
-import { getAccountById, getAllAccounts, type AccountId, type SavingsAccount } from '@/lib/accounts';
+import { getAccountById, getAllAccounts, isAccountId, type AccountId, type SavingsAccount } from '@/lib/accounts';
 import { WithdrawForm } from '@/components/WithdrawForm';
 import { CurrencyIcon } from '@/components/CurrencyIcon';
 
@@ -58,12 +58,19 @@ export default function WithdrawPage() {
   const searchParams = useSearchParams();
   const { client, address } = useYoClient();
 
-  const preselectedAccountId = searchParams.get('account') as AccountId | null;
-  const [selectedAccountId, setSelectedAccountId] = useState<AccountId>(
-    preselectedAccountId || 'dollar'
-  );
+  const accountParam = searchParams.get('account');
+  const preselectedAccountId = accountParam && isAccountId(accountParam) ? accountParam : null;
+  const [selectedAccountId, setSelectedAccountId] = useState<AccountId>(preselectedAccountId || 'dollar');
 
   const selectedAccount = getAccountById(selectedAccountId);
+
+  if (!selectedAccount) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p className="text-[#6C757D]">Account not found</p>
+      </div>
+    );
+  }
   const allAccounts = getAllAccounts();
 
   const { position, isLoading: balanceLoading } = useUserBalance(
@@ -75,7 +82,6 @@ export default function WithdrawPage() {
   const {
     redeem,
     isLoading: redeemLoading,
-    hash,
     instant,
     reset: resetRedeem,
   } = useRedeem({

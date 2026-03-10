@@ -8,12 +8,12 @@ import { useUserBalance } from '@yo-protocol/react';
 import { GoalCard } from '@/components/GoalCard';
 import { AuthGate } from '@/components/AuthGate';
 import { loadGoals, createGoal, updateGoal, deleteGoal, type SavingsGoal } from '@/lib/goals';
-import { getAllAccounts, getAccountById, type AccountId } from '@/lib/accounts';
+import { getAllAccounts, getAccountById, getDefaultAccount, type AccountId } from '@/lib/accounts';
 import { CurrencyIcon } from '@/components/CurrencyIcon';
 
 // Hook to fetch balance for a single account
 function useAccountBalance(accountId: AccountId, address?: `0x${string}`) {
-  const account = getAccountById(accountId);
+  const account = getAccountById(accountId) ?? getDefaultAccount();
   const { position, isLoading } = useUserBalance(
     account.vaultAddress as `0x${string}`,
     address

@@ -39,10 +39,18 @@ export const SAVINGS_ACCOUNTS: Record<AccountId, SavingsAccount> = {
   },
 };
 
-export const getAccountById = (id: AccountId): SavingsAccount => {
-  return SAVINGS_ACCOUNTS[id];
+export const isAccountId = (id: string): id is AccountId => {
+  return id in SAVINGS_ACCOUNTS;
+};
+
+export const getAccountById = (id: string): SavingsAccount | undefined => {
+  return isAccountId(id) ? SAVINGS_ACCOUNTS[id] : undefined;
 };
 
 export const getAllAccounts = (): SavingsAccount[] => {
   return Object.values(SAVINGS_ACCOUNTS);
+};
+
+export const getDefaultAccount = (): SavingsAccount => {
+  return SAVINGS_ACCOUNTS.dollar;
 };
